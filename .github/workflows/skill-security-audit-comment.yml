@@ -1,0 +1,107 @@
+---
+name: 发布安全审计评论
+
+'on':
+  workflow_run:
+    workflows: ["Skill Security Audit"]
+    types:
+      - completed
+
+jobs:
+  comment:
+    name: 发布审计结果
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion != 'cancelled'
+    permissions:
+      pull-requests: write
+      actions: read
+    steps:
+      - name: 下载审计报告工件
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: ${{ github.event.workflow_run.id }},
+            });
+            const match = artifacts.data.artifacts.find(a => a.name === 'security-audit-report');
+            if (!match) {
+              core.setFailed('未找到 security-audit-report 工件');
+              return;
+            }
+            const download = await github.rest.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: match.id,
+              archive_format: 'zip',
+            });
+            const fs = require('fs');
+            fs.writeFileSync('${{ runner.temp }}/report.zip', Buffer.from(download.data));
+
+      - name: 解压工件
+        run: |
+          mkdir -p "${{ runner.temp }}/report"
+          unzip -o "${{ runner.temp }}/report.zip" -d "${{ runner.temp }}/report"
+
+      - name: 发布或更新 PR 评论
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const reportDir = '${{ runner.temp }}/report';
+
+            // 读取 PR 编号
+            const prNumberFile = fs.readdirSync(reportDir).find(f => f === 'pr_number')
+              ? path.join(reportDir, 'pr_number')
+              : null;
+            if (!prNumberFile) {
+              core.setFailed('工件中未找到 pr_number 文件');
+              return;
+            }
+            const prNumber = parseInt(fs.readFileSync(prNumberFile, 'utf8').trim(), 10);
+            if (isNaN(prNumber)) {
+              core.setFailed('工件中的 PR 编号无效');
+              return;
+            }
+
+            // 读取报告
+            const reportFile = path.join(reportDir, 'report.md');
+            let body = '## Skill Security Audit\n\n未生成报告。';
+            if (fs.existsSync(reportFile)) {
+              body = fs.readFileSync(reportFile, 'utf8');
+            } else {
+              // 备用方案：查找除 pr_number 外的任意文件
+              const files = fs.readdirSync(reportDir).filter(f => f !== 'pr_number');
+              if (files.length > 0) {
+                body = fs.readFileSync(path.join(reportDir, files[0]), 'utf8');
+              }
+            }
+
+            // 查找并更新已有评论或创建新评论
+            const marker = '## Skill Security Audit';
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body.startsWith(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body,
+              });
+            }

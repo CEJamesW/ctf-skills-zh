@@ -1,0 +1,30 @@
+---
+name: Markdown Lint
+
+'on':
+  pull_request:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.md'
+      - '.markdownlint-cli2.yaml'
+      - '.github/workflows/markdown-lint.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: markdown-lint-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  markdownlint:
+    name: Markdown 语法检查
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: 签出代码
+        uses: actions/checkout@v6
+
+      - name: 运行 markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v23

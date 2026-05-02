@@ -1,0 +1,26 @@
+# Lychee 链接检查器配置
+# https://lychee.cli.rs/usage/config/
+
+# 排除阻止 CI 机器人或不可靠的 URL
+exclude = [
+  "quipqiup\\.com",       # 经常超时
+  "rbndr\\.us",           # DNS 重新绑定工具 — 经常离线
+  "whatsmyname\\.app",    # 阻止自动请求 (403)
+  "dcode\\.fr",           # CI 中经常超时
+  "wry\\.me",             # Bytebeat 解释器 — 经常超时
+]
+
+# 接受常见的“软错误”状态码
+accept = [200, 204, 301, 302, 403, 429]
+
+# 忽略 file:// 链接（出现在代码示例中，不是真实引用）
+scheme = ["https", "http"]
+
+# 每个请求的超时时间
+timeout = 15
+
+# 限制并发请求以避免速率限制
+max_concurrency = 8
+
+# 重试临时失败
+max_retries = 2

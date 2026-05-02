@@ -1,0 +1,45 @@
+config:
+  # 允许长行 — 技术文件中包含长 URL、代码引用、表格
+  MD013: false
+  # 允许内联 HTML — 用于 <details>、<summary> 等标签
+  MD033: false
+  # 允许重复标题 — 不同技术文件复用章节名称
+  MD024: false
+  # 允许标题末尾标点 — 技术名称包含括号等符号
+  MD026: false
+  # 允许多个顶级标题 — 某些文件有结构性原因
+  MD025: false
+  # 允许裸 URL — CTF writeup 引用中常见
+  MD034: false
+  # 技术文件中的代码块通常缺少上下空行
+  MD031: false
+  # 技术章节中的列表通常缺少上下空行
+  MD032: false
+  # 表格列样式在文件间不统一
+  MD060: false
+  # 标题空行 — 技术文件采用紧凑格式
+  MD022: false
+  # 粗体样式 — 文件中同时使用 ** 和 __
+  MD050: false
+  # 有序列表编号 — 文件中既有顺序编号也有全为 1 的编号
+  MD029: false
+  # 表格管道符间距
+  MD058: false
+  # 使用强调代替标题 — 技术模式描述中常见
+  MD036: false
+  # 反向链接语法 — shell/CTF 符号导致误报
+  MD011: false
+  # 强调中的空格 — 数学表达式和 Python dunder 导致误报
+  MD037: false
+  # 代码片段中的空格 — CTF payload 中转义字符导致误报
+  MD038: false
+  # 图片替代文本 — CTF payload 模式中包含 ![ 导致误报
+  MD045: false
+  # 链接片段 — 含特殊字符（冒号、dunder）的标题导致误报
+  MD051: false
+  # 表格列数 — 表格单元中代码片段的管道符导致误报
+  MD056: false
+
+ignores:
+  - .pytest_cache/**
+  - "**/node_modules/**"

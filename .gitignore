@@ -1,0 +1,24 @@
+# Claude Code
+.claude/worktrees
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 生成文件
+_site/
+
+# 操作系统
+.DS_Store
+Thumbs.db

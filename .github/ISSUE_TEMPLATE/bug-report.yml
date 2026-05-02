@@ -1,0 +1,61 @@
+name: Bug Report
+description: 报告技能、脚本或工具中的错误
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您报告错误。请填写以下详细信息以帮助我们调查。
+
+  - type: input
+    id: affected-file
+    attributes:
+      label: 受影响的文件或技能
+      description: 哪个文件或技能类别受到影响？
+      placeholder: "例如，ctf-web/SKILL.md，scripts/install_ctf_tools.sh"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 描述
+      description: 具体是什么错误？请尽可能详细说明。
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: 重现步骤
+      description: 我们如何重现该问题？
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 预期行为
+      description: 您期望发生什么？
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: 实际行为
+      description: 实际发生了什么？
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境
+      description: 任何相关的环境细节（操作系统、工具版本、代理运行时）
+      placeholder: |
+        - OS: Ubuntu 24.04
+        - Python: 3.14
+        - Agent: Claude Code
+    validations:
+      required: false

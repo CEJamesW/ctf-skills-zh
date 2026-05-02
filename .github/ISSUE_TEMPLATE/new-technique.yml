@@ -1,0 +1,52 @@
+name: 新技术
+description: 建议从 writeup 或比赛中添加新的 CTF 技术
+labels: ["new-technique"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢贡献新技术！请在下方提供详细信息。
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 分类
+      description: 该技术属于哪个技能类别？
+      options:
+        - ctf-ai-ml
+        - ctf-crypto
+        - ctf-forensics
+        - ctf-malware
+        - ctf-misc
+        - ctf-osint
+        - ctf-pwn
+        - ctf-reverse
+        - ctf-web
+        - 新类别（请在下方描述）
+    validations:
+      required: true
+
+  - type: input
+    id: source-url
+    attributes:
+      label: 来源 Writeup URL
+      description: CTF writeup、博客文章或比赛解题链接
+      placeholder: "https://example.com/ctf-writeup"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 技术描述
+      description: 技术的简要描述、利用点及何时应使用该技术
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 额外背景
+      description: 其他相关细节（相关 CVE、替代 writeup、边缘情况）
+    validations:
+      required: false

@@ -1,0 +1,42 @@
+name: 覆盖缺口
+description: 报告技能类别中缺失的技术覆盖
+labels: ["coverage-gap"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        使用此表单标记技能类别中缺少的技术，这些技术有助于解决实际的CTF挑战。
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 类别
+      description: 哪个技能类别存在覆盖缺口？
+      options:
+        - ctf-ai-ml
+        - ctf-crypto
+        - ctf-forensics
+        - ctf-malware
+        - ctf-misc
+        - ctf-osint
+        - ctf-pwn
+        - ctf-reverse
+        - ctf-web
+    validations:
+      required: true
+
+  - type: textarea
+    id: whats-missing
+    attributes:
+      label: 缺失内容
+      description: 描述缺失或不足的技术、漏洞类别或工具覆盖
+    validations:
+      required: true
+
+  - type: textarea
+    id: reference-links
+    attributes:
+      label: 参考链接
+      description: 展示该缺口的writeup、论文、工具或文档链接
+    validations:
+      required: false

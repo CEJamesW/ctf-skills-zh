@@ -1,0 +1,207 @@
+---
+name: 技能安全审计
+
+'on':
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - '.github/**'
+      - 'scripts/**'
+      - 'tests/**'
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
+      - 'scripts/**'
+      - 'tests/**'
+  workflow_dispatch:
+
+concurrency:
+  group: security-audit-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  detect-skills:
+    name: 检测需审计的技能
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      skills: ${{ steps.list.outputs.skills }}
+      has_skills: ${{ steps.list.outputs.has_skills }}
+    steps:
+      - name: 签出代码
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: 查找需审计的技能
+        id: list
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            SKILL_FILES=$(find . -name SKILL.md -not -path './.git/*' | sort)
+            LABEL="所有技能"
+          else
+            if [ "$EVENT_NAME" = "pull_request" ]; then
+              CHANGED=$(git diff --name-only "origin/$BASE_REF"...HEAD 2>/dev/null || echo "")
+            else
+              BEFORE="$PUSH_BEFORE"
+              if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+                CHANGED=$(git diff-tree --no-commit-id --name-only -r HEAD 2>/dev/null || echo "")
+              else
+                CHANGED=$(git diff --name-only "$BEFORE"...HEAD 2>/dev/null || echo "")
+              fi
+            fi
+
+            SKILL_FILES=""
+            while IFS= read -r file; do
+              dir=$(echo "$file" | cut -d'/' -f1)
+              case "$dir" in
+                ""|.github|.claude|.codex|.gemini|scripts|docs) continue ;;
+              esac
+              if [ -f "$dir/SKILL.md" ]; then
+                SKILL_FILES+="./$dir/SKILL.md"$'\n'
+              fi
+            done <<< "$CHANGED"
+
+            LABEL="变更的技能"
+          fi
+
+          SKILL_FILES=$(printf '%s' "$SKILL_FILES" | sed '/^$/d' | sort -u)
+
+          if [ -z "$SKILL_FILES" ]; then
+            echo "skills=[]" >> "$GITHUB_OUTPUT"
+            echo "has_skills=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          SKILLS=()
+          while IFS= read -r file; do
+            dir=${file#./}
+            dir=${dir%/SKILL.md}
+            [ -n "$dir" ] && SKILLS+=("$dir")
+          done <<< "$SKILL_FILES"
+
+          JSON=$(printf '%s\n' "${SKILLS[@]}" | python3 -c 'import json, sys; print(json.dumps([line.rstrip("\n") for line in sys.stdin if line.rstrip("\n")]))')
+
+          echo "skills=$JSON" >> "$GITHUB_OUTPUT"
+          echo "has_skills=true" >> "$GITHUB_OUTPUT"
+          echo "$LABEL: $JSON"
+
+  audit:
+    name: 安全审计
+    needs: detect-skills
+    if: needs.detect-skills.outputs.has_skills == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: 签出代码
+        uses: actions/checkout@v6
+
+      - name: 设置 Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+
+      - name: 运行安全审计器
+        id: audit
+        env:
+          SKILLS: ${{ needs.detect-skills.outputs.skills }}
+        run: |
+          AUDITOR="scripts/skill_security_auditor.py"
+          REPORT_FILE=$(mktemp)
+          OVERALL_EXIT=0
+
+          echo "## 技能安全审计结果" > "$REPORT_FILE"
+          echo "" >> "$REPORT_FILE"
+
+          while IFS= read -r skill_dir; do
+            [ -z "$skill_dir" ] && continue
+            echo "::group::审计 $skill_dir"
+
+            JSON_OUT=$(python3 "$AUDITOR" "$skill_dir" --strict --json 2>/dev/null) || true
+
+            # 单次 Python 调用：解析 JSON，生成判定和报告部分
+            SECTION=$(python3 -c "
+          import json, sys
+          raw = sys.stdin.read()
+          try:
+              d = json.loads(raw)
+          except Exception:
+              print('STATUS:ERROR')
+              print('REPORT:### \`$skill_dir\` — 错误\n\n审计器未返回有效的 JSON。\n')
+              sys.exit(0)
+
+          v = d.get('verdict', 'UNKNOWN')
+          s = d.get('summary', {})
+          crit, high, info, total = s.get('critical',0), s.get('high',0), s.get('info',0), s.get('total',0)
+          icons = {'PASS':'通过','WARN':'警告','FAIL':'失败'}
+          icon = icons.get(v, '?')
+
+          status = 'FAIL' if v not in ('PASS','WARN') else v
+          print(f'STATUS:{status}')
+
+          lines = [f'### {icon} \`$skill_dir\` — {v}\n']
+          if total > 0:
+              lines.append('| 严重性 | 数量 |')
+              lines.append('|----------|-------|')
+              if crit > 0: lines.append(f'| 严重 | {crit} |')
+              if high > 0: lines.append(f'| 高 | {high} |')
+              if info > 0: lines.append(f'| 信息 | {info} |')
+              lines.append('')
+              if v not in ('PASS',):
+                  lines.append('<details><summary>详细发现</summary>\n')
+                  lines.append('\`\`\`json')
+                  for f in d.get('findings', []):
+                      if f.get('severity') in ('CRITICAL','HIGH'):
+                          lines.append(json.dumps(f, indent=2))
+                  lines.append('\`\`\`')
+                  lines.append('</details>\n')
+          else:
+              lines.append('无发现。\n')
+
+          print('REPORT:' + '\n'.join(lines))
+          " <<< "$JSON_OUT")
+
+            STATUS=$(echo "$SECTION" | grep '^STATUS:' | head -1 | cut -d: -f2)
+            REPORT=$(echo "$SECTION" | sed -n 's/^REPORT://p')
+
+            if [ "$STATUS" = "FAIL" ] || [ "$STATUS" = "ERROR" ]; then
+              OVERALL_EXIT=1
+              [ "$STATUS" = "ERROR" ] && echo "::error::审计器未返回 $skill_dir 的有效 JSON"
+            fi
+
+            echo "$REPORT" >> "$REPORT_FILE"
+            echo "" >> "$REPORT_FILE"
+            echo "::endgroup::"
+          done < <(echo "$SKILLS" | python3 -c "import sys, json; [print(s) for s in json.load(sys.stdin)]")
+
+          echo "report_file=$REPORT_FILE" >> "$GITHUB_OUTPUT"
+          echo "exit_code=$OVERALL_EXIT" >> "$GITHUB_OUTPUT"
+
+      - name: 暂存审计产物
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          mkdir -p "${{ runner.temp }}/audit-stage"
+          cp "${{ steps.audit.outputs.report_file }}" "${{ runner.temp }}/audit-stage/report.md"
+          echo "${{ github.event.number }}" > "${{ runner.temp }}/audit-stage/pr_number"
+
+      - name: 上传审计报告
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: security-audit-report
+          path: ${{ runner.temp }}/audit-stage/
+          retention-days: 5
+
+      - name: 发现严重问题时失败
+        if: steps.audit.outputs.exit_code == '1'
+        run: |
+          echo "::error::安全审计发现严重问题。"
+          exit 1

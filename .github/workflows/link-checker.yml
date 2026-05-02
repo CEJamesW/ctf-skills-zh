@@ -1,0 +1,39 @@
+---
+name: 链接检查器
+
+'on':
+  pull_request:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.md'
+      - '.github/workflows/link-checker.yml'
+      - '.lychee.toml'
+  schedule:
+    - cron: '0 8 * * 1' # 每周一 UTC 时间 08:00
+  workflow_dispatch:
+
+concurrency:
+  group: link-checker-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-links:
+    name: 检查链接
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: 签出代码
+        uses: actions/checkout@v6
+
+      - name: Lychee 链接检查器
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --config .lychee.toml
+            --no-progress
+            --exclude-path .pytest_cache
+            '**/*.md'
+          fail: true
