@@ -18,6 +18,7 @@ venv/
 
 # 生成文件
 _site/
+_github_batches/
 
 # 操作系统
 .DS_Store
