@@ -29,6 +29,9 @@ jobs:
         with:
           python-version: '3.14'
 
+      - name: 安装依赖
+        run: pip install markdown
+
       - name: 生成目录
         run: python scripts/generate_catalog.py
 

@@ -7,7 +7,7 @@
 ## 安装
 
 ```bash
-npx skills add ljagiello/ctf-skills
+npx skills add CEJamesW/ctf-skills-zh
 ```
 
 ## 在 Friday Studio 中运行
@@ -20,7 +20,7 @@ Friday Studio 按需将技能加载到 agent 上下文中，并在可复现的�
 
 1. 从 [hellofriday.ai](https://hellofriday.ai/) 安装 Friday（macOS）。
 2. 在 Studio 侧边栏打开 **Skills**，点击 **+ Add**。
-3. 通过引用导入单个技能（例如 `ljagiello/ctf-skills/ctf-web`），或上传整个仓库文件夹。
+3. 通过引用导入单个技能（例如 `CEJamesW/ctf-skills-zh/ctf-web`），或上传整个仓库文件夹。
 4. 在任意 `workspace.yml` 中引用它们，或让 agent 根据技能描述自动加载。
 
 完整工作流请参见 [Friday Skills 文档](https://docs.hellofriday.ai/core-concepts/skills)，以及包含 [AI Drift: The Hidden Cost of Building with AI](https://blog.hellofriday.ai/ai-drift-the-hidden-cost-of-building-with-ai-e2b51415b3b0) 的 [Friday 博客](https://blog.hellofriday.ai/) 了解背后的理念。
