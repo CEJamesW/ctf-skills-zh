@@ -32,7 +32,7 @@ jobs:
       has_skills: ${{ steps.list.outputs.has_skills }}
     steps:
       - name: 签出代码
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: 查找需审计的技能
@@ -101,7 +101,7 @@ jobs:
       contents: read
     steps:
       - name: 签出代码
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: 设置 Python
         uses: actions/setup-python@v6
