@@ -99,7 +99,7 @@ mediainfo video.mp4          # 视频元数据
 ## Newspaper Archives and Historical Research
 
 - Scout Life 杂志档案：https://scoutlife.org/wayback/
-- 美国国会图书馆：https://www.loc.gov/（报纸搜索）
+- [美国国会图书馆](https://www.loc.gov/)（报纸搜索）
 - 使用带日期范围的高级搜索
 
 **模式（It's News, VuwCTF 2025）：** 结合报纸档案日期搜索与 EXIF GPS 坐标进行特定地点识别。

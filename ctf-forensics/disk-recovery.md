@@ -590,7 +590,7 @@ xz -d broken.xz
 
 ## 通过 bkcrack 破解 ZipCrypto 已知明文（Codegate 2019）
 
-**模式：** ZipCrypto（传统 PKZIP 流密码，非 AES-256）在拥有至少 12 字节已知明文时易受已知明文攻击。`pkcrack` 是经典工具，但常在现代压缩包上失败；`bkcrack`（https://github.com/kimci86/bkcrack）能处理部分头部的边缘情况。
+**模式：** ZipCrypto（传统 PKZIP 流密码，非 AES-256）在拥有至少 12 字节已知明文时易受已知明文攻击。`pkcrack` 是经典工具，但常在现代压缩包上失败；`bkcrack`（[bkcrack](https://github.com/kimci86/bkcrack)）能处理部分头部的边缘情况。
 
 ```bash
 # 提取任意未加密的邻近文件及其加密版本

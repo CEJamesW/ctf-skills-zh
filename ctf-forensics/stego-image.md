@@ -625,7 +625,7 @@ big.save('trap.png')
 
 ## ImageMagick +append Puzzle Stitching + gaps Solver (X-MAS CTF 2018)
 
-**模式：** 磁盘镜像包含 N 个由 `foremost` 或 `scalpel` 切割出的拼图 PNG。用 ImageMagick 的 `convert +append` 将所有碎片水平拼接，然后用已知碎片大小（通常存储在 EXIF）将拼接条传给 `gaps` 拼图求解器（https://github.com/nemanja-m/gaps）自动重组。
+**模式：** 磁盘镜像包含 N 个由 `foremost` 或 `scalpel` 切割出的拼图 PNG。用 ImageMagick 的 `convert +append` 将所有碎片水平拼接，然后用已知碎片大小（通常存储在 EXIF）将拼接条传给 `gaps` 拼图求解器（[gaps](https://github.com/nemanja-m/gaps)）自动重组。
 
 ```bash
 foremost -t png -i disk.img -o pieces
