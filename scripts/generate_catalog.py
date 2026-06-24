@@ -111,7 +111,7 @@ def strip_frontmatter(text: str) -> str:
         return text
     for i, line in enumerate(lines[1:], start=1):
         if line.strip() == "---":
-            return "\n".join(lines[i + 1:])
+            return "\n".join(lines[i + 1 :])
     return text
 
 
@@ -219,11 +219,9 @@ def render_markdown_page(
     crumb_html = ""
     for i, (label, href) in enumerate(breadcrumb):
         if href:
-            crumb_html += (
-                f'<a href="{html.escape(href)}">{html.escape(label)}</a>'
-            )
+            crumb_html += f'<a href="{html.escape(href)}">{html.escape(label)}</a>'
         else:
-            crumb_html += f'<span>{html.escape(label)}</span>'
+            crumb_html += f"<span>{html.escape(label)}</span>"
         if i < len(breadcrumb) - 1:
             crumb_html += '<span class="crumb-sep">›</span>'
 
@@ -269,22 +267,18 @@ def build_index_html(skills: list[dict]) -> str:
         skill_link = f"{s['dir_name']}/SKILL.html"
 
         if s["techniques"]:
-            badge_text = (
-                f"{tech_count} 篇" if tech_count != 1 else "1 篇"
-            )
+            badge_text = f"{tech_count} 篇" if tech_count != 1 else "1 篇"
             items = []
             for t in s["techniques"]:
                 href = f"{s['dir_name']}/{Path(t['file']).stem}.html"
-                items.append(
-                    f'<li><a href="{href}">{html.escape(t["name"])}</a></li>'
-                )
+                items.append(f'<li><a href="{href}">{html.escape(t["name"])}</a></li>')
             tech_list = f'<ul class="technique-list">{"".join(items)}</ul>'
         else:
             badge_text = "查看 SKILL"
             tech_list = (
                 '<ul class="technique-list">'
                 f'<li><a href="{skill_link}">查看 SKILL.md →</a></li>'
-                '</ul>'
+                "</ul>"
             )
 
         cards.append(f"""
