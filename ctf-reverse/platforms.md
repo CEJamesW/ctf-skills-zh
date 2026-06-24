@@ -299,7 +299,7 @@ qemu-mipsel -L /usr/mipsel-linux-gnu/ ./mipsel_binary   # Little-endian
 # lui + addiu pair — loads 32-bit constant (upper 16 + lower 16)
 ```
 
-**RISC-V：** 基础分析见 [tools.md](tools.md#risc-v-binary-analysis-ehax-2026)，高级扩展与调试见 [platforms-hardware.md](platforms-hardware.md#risc-v-advanced)。
+**RISC-V：** 基础分析见 [tools.md](tools.md#risc-v-二进制分析-ehax-2026)，高级扩展与调试见 [platforms-hardware.md](platforms-hardware.md#risc-v-advanced)。
 
 ### RTOS Analysis
 

@@ -177,7 +177,7 @@ Tauri 在可执行文件中嵌入 Brotli 压缩的前端资源。查找 `index.h
 对每个位置尝试每个字节（0-255），与期望输出匹配。**统一变换捷径：** 如果一个输入字节只改变一个输出字节，构建 0..255 映射后再反转。完整实现见 [patterns.md](patterns.md)。
 
 ### Unicorn 仿真（复杂状态）
-`from unicorn import *` —— 映射段，设置栈，hook 追踪。**混合模式陷阱：** 64 位 stub 通过 `retf` 跳转到 32 位，需要切换到 UC_MODE_32 并复制 GPR、EFLAGS 和 XMM 寄存器。详见 [tools.md](tools.md#unicorn-emulation)。
+`from unicorn import *` —— 映射段，设置栈，hook 追踪。**混合模式陷阱：** 64 位 stub 通过 `retf` 跳转到 32 位，需要切换到 UC_MODE_32 并复制 GPR、EFLAGS 和 XMM 寄存器。详见 [tools.md](tools.md#unicorn-模拟)。
 
 ### 多阶段 Shellcode 加载器
 嵌套 shellcode 带 XOR 解码循环；在 `call rax` 处断点，使用 `set $rax=0` 绕过 ptrace，从 `mov` 指令中提取 flag。详见 [patterns-runtime.md](patterns-runtime.md#multi-stage-shellcode-loaders)。
@@ -220,7 +220,7 @@ Tauri 在可执行文件中嵌入 Brotli 压缩的前端资源。查找 `index.h
 **模式：** 二进制通过牛顿法收敛性（例如，z^3-1=0）对坐标对进行分类。通过通过/失败结果的网格渲染 ASCII 艺术旗帜。关键：二进制是分类器，不是检查器——反转数学并进行可视化。参见 [patterns-ctf.md](patterns-ctf.md#mathematical-convergence-bitmap-ehax-2026)。
 
 ### RISC-V 二进制分析
-静态链接、剥离的 RISC-V ELF。使用 Capstone 的 `CS_MODE_RISCVC | CS_MODE_RISCV64` 支持混合压缩指令。用 `qemu-riscv64` 模拟。注意伪造的 flag 和带增量密钥的 XOR 解密。参见 [tools.md](tools.md#risc-v-binary-analysis-ehax-2026)。
+静态链接、剥离的 RISC-V ELF。使用 Capstone 的 `CS_MODE_RISCVC | CS_MODE_RISCV64` 支持混合压缩指令。用 `qemu-riscv64` 模拟。注意伪造的 flag 和带增量密钥的 XOR 解密。参见 [tools.md](tools.md#risc-v-二进制分析-ehax-2026)。
 
 ### Sprague-Grundy 博弈论二进制
 游戏二进制玩有限 Nim，使用伪随机数生成器（PRNG）选择失败位置的移动。识别游戏框架（Grundy 值 = 堆 % (k+1)，XOR 决定位置），通过用户输入反馈跟踪 PRNG 状态演变。参见 [patterns-ctf.md](patterns-ctf.md#sprague-grundy-game-theory-binary-dicectf-2026)。
@@ -293,15 +293,15 @@ D 语言二进制具有独特的符号混淆（非 C++ 风格）。模板密集�
 带有 `core::panicking` 字符串和 `_ZN` 混淆符号的二进制？使用 `rustfilt` 进行符号解混淆。Panic 消息包含源代码路径和行号——最快方法是 `strings binary | grep "panicked"`。Option/Result 枚举使用判别字节（0=无/错误，1=有/成功）。详见 [languages-compiled.md](languages-compiled.md#rust-binary-reversing)。
 
 ### Frida 动态插桩
-无需修改二进制即可 Hook 运行时函数。使用 `frida -f ./binary -l hook.js` 启动并插桩。Hook `strcmp`/`memcmp` 捕获预期值，通过替换 `ptrace` 返回值绕过反调试，扫描内存查找 flag 模式，替换验证函数。详见 [tools-dynamic.md](tools-dynamic.md#frida-dynamic-instrumentation)。
+无需修改二进制即可 Hook 运行时函数。使用 `frida -f ./binary -l hook.js` 启动并插桩。Hook `strcmp`/`memcmp` 捕获预期值，通过替换 `ptrace` 返回值绕过反调试，扫描内存查找 flag 模式，替换验证函数。详见 [tools-dynamic.md](tools-dynamic.md#frida动态插桩)。
 
 ### Frida Firebase 云函数绕过
 **模式：** Android 应用通过 Firebase 云函数验证。登录后使用 Frida hook 构造有效负载（UID + 值 + 时间戳）并直接调用云函数，绕过二维码/支付验证。详见 [languages-platforms.md](languages-platforms.md#frida-firebase-cloud-functions-bypass-bsidessf-2026)。
 
 ### angr 符号执行
-自动路径探索以找到满足约束的输入。用 `angr.Project` 加载二进制，设置查找/避免地址，调用 `simgr.explore()`。限制输入为可打印 ASCII 和已知前缀以加速求解。Hook 代价高的函数（加密、I/O）防止路径爆炸。详见 [tools-dynamic.md](tools-dynamic.md#angr-symbolic-execution)。
+自动路径探索以找到满足约束的输入。用 `angr.Project` 加载二进制，设置查找/避免地址，调用 `simgr.explore()`。限制输入为可打印 ASCII 和已知前缀以加速求解。Hook 代价高的函数（加密、I/O）防止路径爆炸。详见 [tools-dynamic.md](tools-dynamic.md#angr符号执行)。
 ### Qiling Emulation
-跨平台二进制仿真，支持操作系统级别（系统调用、文件系统）。可在任意主机上仿真 Linux/Windows/ARM/MIPS 二进制。无调试器痕迹——默认绕过所有反调试。通过 Python API 钩取系统调用和地址。详见 [tools-dynamic.md](tools-emulation.md#qiling-framework-cross-platform-emulation)。
+跨平台二进制仿真，支持操作系统级别（系统调用、文件系统）。可在任意主机上仿真 Linux/Windows/ARM/MIPS 二进制。无调试器痕迹——默认绕过所有反调试。通过 Python API 钩取系统调用和地址。详见 [tools-dynamic.md](tools-emulation.md#qiling-框架跨平台仿真)。
 
 ### VMProtect / Themida 分析
 VMProtect 将代码虚拟化为自定义字节码。识别虚拟机入口（类似 pushad），找到处理器表（大型间接跳转），动态追踪处理器。CTF 中重点追踪输入上的操作，而非完全反虚拟化。Themida：使用 ScyllaHide + Scylla 在 OEP 处导出。详见 [tools-advanced.md](tools-advanced.md#vmprotect-analysis)。
@@ -345,7 +345,7 @@ Swift：`swift demangle` 还原符号，协议见证表用于分发，`__swift5_
 一种使用迭代分数乘法的晦涩语言。通过交换分数表中的分子和分母，反向运行输出进行逆转。输入输出编码为质因数分解的指数。详见 [languages.md](languages.md#fractran-program-inversion-boston-key-party-2016)。
 
 ### 仅含 Opcode 的执行轨迹重构
-仅含操作码（无数据）的执行轨迹仍通过分支决策泄露信息。排序算法的比较揭示元素顺序。通过去重轨迹并拆分为基本块进行重构。详见 [tools-dynamic.md](tools-emulation.md#opcode-only-trace-reconstruction-0ctf-2016)。
+仅含操作码（无数据）的执行轨迹仍通过分支决策泄露信息。排序算法的比较揭示元素顺序。通过去重轨迹并拆分为基本块进行重构。详见 [tools-dynamic.md](tools-emulation.md#仅操作码追踪重构opcode-only-trace-reconstruction0ctf-2016)。
 
 ### 线程竞态带符号整数溢出
 游戏二进制存在线程不安全的技能锁。技能选择与伤害计算竞态；`cdqe` 指令将 0xFFFFFFFF 符号扩展为 -1，导致减法时 HP 溢出。详见 [patterns-ctf-3.md](patterns-ctf-3.md#thread-race-condition-with-signed-integer-overflow-codegate-2017)。

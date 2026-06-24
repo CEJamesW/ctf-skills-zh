@@ -95,7 +95,7 @@ SCMP_CMP 操作符：`NE=1, LT=2, LE=3, EQ=4, GE=5, GT=6, MASKED_EQ=7`
 
 ## rdx Control in ROP Chains
 
-完整说明与代码示例见 [rop-and-shellcode.md](rop-and-shellcode.md#rdx-control-in-rop-chains)。
+完整说明与代码示例见 [rop-and-shellcode.md](rop-and-shellcode.md#rop-链中-rdx-控制)。
 
 ---
 

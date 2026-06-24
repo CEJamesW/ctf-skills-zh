@@ -161,9 +161,9 @@ zbarimg qrcode.png       # 解码
 qrencode -o out.png "data"
 ```
 
-**MaxiCode 条码：** 六角形二维条码，中心有靶心；标准二维码解码器无法识别，使用 `zxing`（Java）解码。详见 [encodings-advanced.md](encodings-advanced.md#maxicode-2d-barcode-decoding-csaw-ctf-2016)。
+**MaxiCode 条码：** 六角形二维条码，中心有靶心；标准二维码解码器无法识别，使用 `zxing`（Java）解码。详见 [encodings-advanced.md](encodings-advanced.md#maxicode-2d-条码解码csaw-ctf-2016)。
 
-**TOPKEK 编码：** CTF 特定二进制编码，`KEK=0`，`TOP=1`，`!` 后缀表示重复次数。详见 [encodings-advanced.md](encodings-advanced.md#topkek-binary-encoding-hack-the-vote-2016)。
+**TOPKEK 编码：** CTF 特定二进制编码，`KEK=0`，`TOP=1`，`!` 后缀表示重复次数。详见 [encodings-advanced.md](encodings-advanced.md#topkek-二进制编码hack-the-vote-2016)。
 
 详见 [encodings.md](encodings.md) 中的二维码结构、修复技巧、分块重组（结构化和索引目录变体）及多阶段 URL 编码链。
 ## Audio Challenges
@@ -245,15 +245,15 @@ new_data = sha.extend(b'extension', b'original_message', len_secret, known_hash_
 - **Brainfuck 插桩:** 插桩 BF 解释器跟踪带子单元，通过验证单元逐字符暴力破解 flag。详见 [games-and-vms-2.md](games-and-vms-2.md)。
 - **WASM 内存操作:** 运行时补丁 WASM 线性内存，直接设置游戏状态变量，绕过游戏逻辑。详见 [games-and-vms-2.md](games-and-vms-2.md)。
 - **Lua 沙箱逃逸:** 通过 `os["execute"]` 表索引或 `loadstring` 别名绕过 `load()`/`os.execute()` 过滤。详见 [games-and-vms.md](games-and-vms.md#lua-sandbox-escape-via-function-name-injection-csaw-ctf-2016)。
-- **C 代码 Jail 通过表情符号 + gadget 嵌入逃逸:** 当 C 代码仅允许表情符号和标点时，使用 `(😃==😃)` 作为常数 1，构建整数，在 `add eax, imm32` 常数中嵌入 gadget，跳转到偏移+1 实现 shellcode 原语。详见 [games-and-vms-3.md](games-and-vms-3.md#c-code-jail-escape-via-emoji-identifiers-and-gadget-embedding-midnight-flag-2026)。
+- **C 代码 Jail 通过表情符号 + gadget 嵌入逃逸:** 当 C 代码仅允许表情符号和标点时，使用 `(😃==😃)` 作为常数 1，构建整数，在 `add eax, imm32` 常数中嵌入 gadget，跳转到偏移+1 实现 shellcode 原语。详见 [games-and-vms-3.md](games-and-vms-3.md#c代码沙箱逃逸通过emoji标识符和gadget嵌入-midnight-flag-2026)。
 - **模拟器 ROM 切换:** `/load` 替换 ROM 但保留 CPU 状态（寄存器、RAM、PC）。在特定 PC 切换 ROM，将一个 ROM 的 INIT 与另一个的显示指令结合 → 读取受保护内存。详见 [games-and-vms-3.md](games-and-vms-3.md#emulator-rom-switching-state-preservation-bsidessf-2026)。
-- **BuildKit 守护进程利用:** 暴露的 BuildKit gRPC 允许嵌套 `buildctl build` 使用 `--mount=type=secret` 读取构建密钥。两阶段 Dockerfile：安装 buildctl → 提交挂载 flag 密钥的嵌套构建。详见 [games-and-vms-3.md](games-and-vms-3.md#buildkit-daemon-exploitation-for-build-secrets-bsidessf-2026)。
-- **Docker 容器逃逸:** 通过主机设备挂载、docker.sock 套接字逃逸、CAP_SYS_ADMIN cgroup release_agent、通过 /proc 和 overlayfs 泄露容器信息实现特权突破。详见 [games-and-vms-3.md](games-and-vms-3.md#docker-container-escape-techniques)。
-- **通过类型强制绕过污点分析:** 在带有保密/污点系统的自定义 ML 类语言中，if 表达式的保密性取决于返回类型而非条件 — 强制副作用函数为私有类型，通过公共可变引用泄露私有数据。详见 [games-and-vms-3.md](games-and-vms-3.md#taint-analysis-bypass-in-custom-language-via-type-coercion-plaidctf-2018)。
-- **碎纸文件像素边缘重组:** 将每条碎纸的左右边缘编码为二进制掩码（暗=1），使用 XOR + popcount 汉明距离贪心排列碎纸，实现亚秒级重组。详见 [games-and-vms-3.md](games-and-vms-3.md#shredded-document-pixel-edge-reassembly-under-time-pressure-nuit-du-hack-ctf-2018)。
-- **通过存储 eval 的 f-string 配置注入:** 将 payload 存为配置值，创建名为 `eval(stored_key)` 的键 — f-string 渲染时计算键名表达式，触发 RCE。详见 [pyjails.md](pyjails.md#python-f-string-config-injection-via-stored-eval-inshack-2018)。
-- **十六进制数独 + QR 组装:** 4 个 QR 码编码 16x16 十六进制数独象限；解出网格，读取对角线为十六进制对 → ASCII flag。详见 [encodings-advanced.md](encodings-advanced.md#hexadecimal-sudoku--qr-assembly-bsidessf-2026)。
-- **Z3 布尔门网络 SAT 求解：** 产品密钥验证作为 250 个布尔门（AND/OR/XOR/NOT）作用于 125 个输入位。将每个门建模为 Z3 约束，要求所有输出为 True，毫秒级求解。详见 [games-and-vms.md](games-and-vms.md#z3-sat-solving-for-boolean-logic-gate-networks-bsidessf-2026)。
+- **BuildKit 守护进程利用:** 暴露的 BuildKit gRPC 允许嵌套 `buildctl build` 使用 `--mount=type=secret` 读取构建密钥。两阶段 Dockerfile：安装 buildctl → 提交挂载 flag 密钥的嵌套构建。详见 [games-and-vms-3.md](games-and-vms-3.md#buildkit-守护进程利用以获取构建秘密bsidessf-2026)。
+- **Docker 容器逃逸:** 通过主机设备挂载、docker.sock 套接字逃逸、CAP_SYS_ADMIN cgroup release_agent、通过 /proc 和 overlayfs 泄露容器信息实现特权突破。详见 [games-and-vms-3.md](games-and-vms-3.md#docker-容器逃逸技术)。
+- **通过类型强制绕过污点分析:** 在带有保密/污点系统的自定义 ML 类语言中，if 表达式的保密性取决于返回类型而非条件 — 强制副作用函数为私有类型，通过公共可变引用泄露私有数据。详见 [games-and-vms-3.md](games-and-vms-3.md#通过类型强制绕过自定义语言中的污点分析plaidctf-2018)。
+- **碎纸文件像素边缘重组:** 将每条碎纸的左右边缘编码为二进制掩码（暗=1），使用 XOR + popcount 汉明距离贪心排列碎纸，实现亚秒级重组。详见 [games-and-vms-3.md](games-and-vms-3.md#在时间压力下通过像素边缘重组碎纸文档nuit-du-hack-ctf-2018)。
+- **通过存储 eval 的 f-string 配置注入:** 将 payload 存为配置值，创建名为 `eval(stored_key)` 的键 — f-string 渲染时计算键名表达式，触发 RCE。详见 [pyjails.md](pyjails.md#python-f-string-配置注入通过存储的-eval-inshack-2018)。
+- **十六进制数独 + QR 组装:** 4 个 QR 码编码 16x16 十六进制数独象限；解出网格，读取对角线为十六进制对 → ASCII flag。详见 [encodings-advanced.md](encodings-advanced.md#十六进制数独--qr-组装bsidessf-2026)。
+- **Z3 布尔门网络 SAT 求解：** 产品密钥验证作为 250 个布尔门（AND/OR/XOR/NOT）作用于 125 个输入位。将每个门建模为 Z3 约束，要求所有输出为 True，毫秒级求解。详见 [games-and-vms.md](games-and-vms.md#z3-sat-求解布尔逻辑门网络bsidessf-2026)。
 
 ## 3D 打印机视频喷嘴追踪 (LACTF 2026)
 
@@ -326,22 +326,22 @@ cat /root/flag.txt
 
 ## Sudo 通配符参数注入 (Dump HTB)
 
-Sudo 的 `fnmatch()` 会跨参数边界匹配 `*`。向受限命令注入额外标志（`-Z root`、`-r`、第二个 `-w`）。构造带有效 sudoers 条目的 pcap —— sudo 的解析器能从二进制垃圾中恢复，区别于 cron 的严格解析器。详见 [linux-privesc.md](linux-privesc.md#sudo-wildcard-parameter-injection-via-fnmatch-dump-htb)。
+Sudo 的 `fnmatch()` 会跨参数边界匹配 `*`。向受限命令注入额外标志（`-Z root`、`-r`、第二个 `-w`）。构造带有效 sudoers 条目的 pcap —— sudo 的解析器能从二进制垃圾中恢复，区别于 cron 的严格解析器。详见 [linux-privesc.md](linux-privesc.md#通过-fnmatch-的-sudo-通配符参数注入-dump-htb)。
 
 ## Monit 进程命令行注入 (Zero HTB)
 
-root 权限的 monit 脚本使用 `pgrep -lfa` 提取进程命令行，然后执行修改后的版本。通过 `perl -e '$0 = "..."'` 创建带注入标志的伪造进程。Apache 的 `-d` 参数最后生效覆盖 ServerRoot；`-E` 捕获错误输出。`Include /root/flag` 导致解析错误，泄露文件内容。详见 [linux-privesc.md](linux-privesc.md#monit-confcheck-process-command-line-injection-zero-htb)。
+root 权限的 monit 脚本使用 `pgrep -lfa` 提取进程命令行，然后执行修改后的版本。通过 `perl -e '$0 = "..."'` 创建带注入标志的伪造进程。Apache 的 `-d` 参数最后生效覆盖 ServerRoot；`-E` 捕获错误输出。`Include /root/flag` 导致解析错误，泄露文件内容。详见 [linux-privesc.md](linux-privesc.md#monit-confcheck-进程命令行注入zero-htb)。
 
 ## PostgreSQL RCE 和文件读取 (Slonik HTB)
 
-`COPY (SELECT '') TO PROGRAM 'cmd'` 以 postgres 用户执行操作系统命令。`pg_read_file('/path')` 读取文件。从 `pg_basebackup` 归档中提取凭据（`global/1260` 即 `pg_authid`）。通过 SSH 隧道连接 Unix 套接字：`ssh -fNL 25432:/var/run/postgresql/.s.PGSQL.5432`。详见 [linux-privesc.md](linux-privesc.md#postgresql-copy-to-program-rce-slonik-htb)。
+`COPY (SELECT '') TO PROGRAM 'cmd'` 以 postgres 用户执行操作系统命令。`pg_read_file('/path')` 读取文件。从 `pg_basebackup` 归档中提取凭据（`global/1260` 即 `pg_authid`）。通过 SSH 隧道连接 Unix 套接字：`ssh -fNL 25432:/var/run/postgresql/.s.PGSQL.5432`。详见 [linux-privesc.md](linux-privesc.md#postgresql-copy-to-program-rceslonik-htb)。
 ## Backup Cronjob SUID Abuse (Slonik HTB)
 
-Root cronjob 复制目录时会保留 SUID 位，但所有权变为 root。将带 SUID 的 bash 放入源目录 → 备份时会复制为 root 拥有的 SUID。使用 `bash -p` 执行。详见 [linux-privesc.md](linux-privesc.md#backup-cronjob-suid-abuse-slonik-htb)。
+Root cronjob 复制目录时会保留 SUID 位，但所有权变为 root。将带 SUID 的 bash 放入源目录 → 备份时会复制为 root 拥有的 SUID。使用 `bash -p` 执行。详见 [linux-privesc.md](linux-privesc.md#备份-cronjob-suid-滥用slonik-htb)。
 
 ## PaperCut Print Deploy Privesc (Bamboo HTB)
 
-Root 进程从用户拥有的目录运行脚本。修改 `server-command`，通过 Mobility Print API 刷新触发。详见 [linux-privesc.md](linux-privesc.md#papercut-print-deploy-privilege-escalation-bamboo-htb)。
+Root 进程从用户拥有的目录运行脚本。修改 `server-command`，通过 Mobility Print API 刷新触发。详见 [linux-privesc.md](linux-privesc.md#papercut-打印部署权限提升bamboo-htb)。
 
 ---
 
@@ -477,16 +477,16 @@ fixed = mojibake.encode('utf-16-be').decode('utf-16-le')
 
 ## HISTFILE 技巧绕过受限 Shell 文件读取（BCTF 2016）
 
-无需 cat/less/head 读取文件：`HISTFILE=/flag /bin/bash && history`，或 `bash -v flag.txt`（详细模式打印行），或使用 `ctypes.sh` 的 `dlcall` 直接调用 C 库。详见 [bashjails.md](bashjails.md#histfile-trick-for-restricted-shell-file-reads-bctf-2016)。
+无需 cat/less/head 读取文件：`HISTFILE=/flag /bin/bash && history`，或 `bash -v flag.txt`（详细模式打印行），或使用 `ctypes.sh` 的 `dlcall` 直接调用 C 库。详见 [bashjails.md](bashjails.md#histfile-技巧用于受限-shell-文件读取-bctf-2016)。
 
 ## Levenshtein 距离 Oracle 攻击（SunshineCTF 2016）
 
-Oracle 返回猜测与秘密的编辑距离。通过空字符串确定长度，单字符重复确定存在字符，二分搜索确定位置。查询复杂度 O(n log n)。详见 [games-and-vms-3.md](games-and-vms-3.md#levenshtein-distance-oracle-attack-sunshinectf-2016)。
+Oracle 返回猜测与秘密的编辑距离。通过空字符串确定长度，单字符重复确定存在字符，二分搜索确定位置。查询复杂度 O(n log n)。详见 [games-and-vms-3.md](games-and-vms-3.md#levenshtein-距离-oracle-攻击sunshinectf-2016)。
 
 ## SECCOMP 高位文件描述符绕过（33C3 CTF 2016）
 
-`close(0x8000000000000002)` 通过 64 位 SECCOMP 检查（不等于 2），但内核截断为 32 位（等于 2），关闭了 fd 2。随后 `open()` 返回 fd 2，打开任意文件。BPF 过滤器与内核间的类型宽度不匹配。详见 [games-and-vms-3.md](games-and-vms-3.md#seccomp-bypass-via-high-bit-file-descriptor-trick-33c3-ctf-2016)。
+`close(0x8000000000000002)` 通过 64 位 SECCOMP 检查（不等于 2），但内核截断为 32 位（等于 2），关闭了 fd 2。随后 `open()` 返回 fd 2，打开任意文件。BPF 过滤器与内核间的类型宽度不匹配。详见 [games-and-vms-3.md](games-and-vms-3.md#通过高位文件描述符技巧绕过-seccomp33c3-ctf-2016)。
 
 ## rvim 通过 Python3 越狱（BKP 2017）
 
-`rvim` 阻止 `:!` 命令，但 `:python3 import os; os.system("cmd")` 可执行任意命令。检查 `:version` 是否包含 `+python3`/`+lua`/`+ruby`。详见 [games-and-vms-3.md](games-and-vms-3.md#rvim-jail-escape-via-custom-vimrc-with-python3-execution-bkp-2017)。
+`rvim` 阻止 `:!` 命令，但 `:python3 import os; os.system("cmd")` 可执行任意命令。检查 `:version` 是否包含 `+python3`/`+lua`/`+ruby`。详见 [games-and-vms-3.md](games-and-vms-3.md#通过带-python3-执行的自定义-vimrc-逃逸-rvim-沙箱bkp-2017)。

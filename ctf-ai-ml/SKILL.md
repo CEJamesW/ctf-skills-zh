@@ -86,32 +86,32 @@ print(f'Shape: {img.shape}, Range: [{img.min():.3f}, {img.max():.3f}]')
 
 ## 模型权重分析
 
-- **权重扰动反转：** 微调后的模型会抑制某种行为；通过计算 `2*W_orig - W_chal` 来反转微调增量，从而恢复被抑制的行为。参见 [model-attacks.md](model-attacks.md#ml-model-weight-perturbation-negation-dicectf-2026)。
-- **LoRA 适配器合并：** 合并 LoRA 适配器 `W_base + alpha * (B @ A)` 并检查激活值或使用合并后的权重生成输出。参见 [model-attacks.md](model-attacks.md#lora-adapter-weight-merging-apoorvctf-2026)。
-- **模型反演：** 通过梯度下降优化随机输入张量，最小化模型输出与已知目标之间的距离。参见 [model-attacks.md](model-attacks.md#ml-model-inversion-via-gradient-descent-bsidessf-2025)。
-- **神经网络碰撞：** 通过联合优化找到两个不同的输入，使其产生相同的编码器输出。参见 [model-attacks.md](model-attacks.md#neural-network-encoder-collision-rootaccess2026)。
+- **权重扰动反转：** 微调后的模型会抑制某种行为；通过计算 `2*W_orig - W_chal` 来反转微调增量，从而恢复被抑制的行为。参见 [model-attacks.md](model-attacks.md#ml-模型权重扰动取反-dicectf-2026)。
+- **LoRA 适配器合并：** 合并 LoRA 适配器 `W_base + alpha * (B @ A)` 并检查激活值或使用合并后的权重生成输出。参见 [model-attacks.md](model-attacks.md#lora-适配器权重合并-apoorvctf-2026)。
+- **模型反演：** 通过梯度下降优化随机输入张量，最小化模型输出与已知目标之间的距离。参见 [model-attacks.md](model-attacks.md#ml-模型梯度下降反演-bsidessf-2025)。
+- **神经网络碰撞：** 通过联合优化找到两个不同的输入，使其产生相同的编码器输出。参见 [model-attacks.md](model-attacks.md#神经网络编码器碰撞-rootaccess2026)。
 
 ## 对抗样本
 
-- **FGSM：** 单步攻击：`x_adv = x + eps * sign(grad_x(loss))`。快速但不如迭代方法有效。参见 [adversarial-ml.md](adversarial-ml.md#adversarial-example-generation-fgsm-pgd-cw)。
-- **PGD：** 带投影的迭代 FGSM，每一步投影回 epsilon 球内。标准基准攻击方法。参见 [adversarial-ml.md](adversarial-ml.md#adversarial-example-generation-fgsm-pgd-cw)。
-- **C&W：** 基于优化的攻击，在实现误分类的同时最小化扰动范数。参见 [adversarial-ml.md](adversarial-ml.md#adversarial-example-generation-fgsm-pgd-cw)。
-- **对抗补丁：** 放置在场景中即可导致误分类的物理世界补丁。参见 [adversarial-ml.md](adversarial-ml.md#adversarial-patch-generation)。
-- **数据投毒：** 向训练数据中注入后门触发器，使模型学习攻击者选定的行为。参见 [adversarial-ml.md](adversarial-ml.md#data-poisoning-foundational)。
+- **FGSM：** 单步攻击：`x_adv = x + eps * sign(grad_x(loss))`。快速但不如迭代方法有效。参见 [adversarial-ml.md](adversarial-ml.md#对抗样本生成fgsmpgdcw)。
+- **PGD：** 带投影的迭代 FGSM，每一步投影回 epsilon 球内。标准基准攻击方法。参见 [adversarial-ml.md](adversarial-ml.md#对抗样本生成fgsmpgdcw)。
+- **C&W：** 基于优化的攻击，在实现误分类的同时最小化扰动范数。参见 [adversarial-ml.md](adversarial-ml.md#对抗样本生成fgsmpgdcw)。
+- **对抗补丁：** 放置在场景中即可导致误分类的物理世界补丁。参见 [adversarial-ml.md](adversarial-ml.md#对抗补丁生成)。
+- **数据投毒：** 向训练数据中注入后门触发器，使模型学习攻击者选定的行为。参见 [adversarial-ml.md](adversarial-ml.md#数据投毒基础)。
 
 ## LLM 攻击
 
-- **提示注入：** 通过用户输入覆盖系统指令；包括直接注入和通过检索文档的间接注入。参见 [llm-attacks.md](llm-attacks.md#prompt-injection-foundational)。
-- **越狱：** 通过 DAN、角色扮演、编码技巧、多轮升级等方式绕过安全过滤器。参见 [llm-attacks.md](llm-attacks.md#llm-jailbreaking-foundational)。
-- **令牌走私（Token Smuggling）：** 利用分词器拆分机制，使被过滤的词以子词令牌形式通过检查。参见 [llm-attacks.md](llm-attacks.md#token-smuggling-foundational)。
-- **工具调用利用：** 滥用 LLM 代理的函数调用功能来执行非预期操作。参见 [llm-attacks.md](llm-attacks.md#tool-use-exploitation-foundational)。
+- **提示注入：** 通过用户输入覆盖系统指令；包括直接注入和通过检索文档的间接注入。参见 [llm-attacks.md](llm-attacks.md#提示注入基础)。
+- **越狱：** 通过 DAN、角色扮演、编码技巧、多轮升级等方式绕过安全过滤器。参见 [llm-attacks.md](llm-attacks.md#llm-越狱基础)。
+- **令牌走私（Token Smuggling）：** 利用分词器拆分机制，使被过滤的词以子词令牌形式通过检查。参见 [llm-attacks.md](llm-attacks.md#令牌走私基础)。
+- **工具调用利用：** 滥用 LLM 代理的函数调用功能来执行非预期操作。参见 [llm-attacks.md](llm-attacks.md#工具使用利用基础)。
 
 ## 模型提取与推断
 
-- **模型提取：** 使用精心构造的输入查询模型 API，以重建其参数或决策边界。参见 [model-attacks.md](model-attacks.md#model-extraction-via-query-api)。
-- **成员推断：** 基于置信度分数分布判断特定样本是否在训练数据中。参见 [model-attacks.md](model-attacks.md#membership-inference-attack)。
+- **模型提取：** 使用精心构造的输入查询模型 API，以重建其参数或决策边界。参见 [model-attacks.md](model-attacks.md#查询-api-模型提取)。
+- **成员推断：** 基于置信度分数分布判断特定样本是否在训练数据中。参见 [model-attacks.md](model-attacks.md#成员推断攻击)。
 
 ## 基于梯度的技术
 
-- **基于梯度的输入恢复：** 利用模型梯度从共享梯度中重建私有训练数据（联邦学习攻击）。参见 [model-attacks.md](model-attacks.md#ml-model-inversion-via-gradient-descent-bsidessf-2025)。
+- **基于梯度的输入恢复：** 利用模型梯度从共享梯度中重建私有训练数据（联邦学习攻击）。参见 [model-attacks.md](model-attacks.md#ml-模型梯度下降反演-bsidessf-2025)。
 - **激活最大化：** 优化输入以最大化特定神经元的激活值，揭示网络学到的内容。

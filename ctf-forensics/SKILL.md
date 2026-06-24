@@ -148,10 +148,10 @@ stegsolve                    # 可视化分析
 - **SVG 关键帧：** 动画的 `keyTimes`/`values` 属性通过填充色交替编码二进制/摩斯码
 - **PNG 块重排：** 修正块顺序：IHDR → 辅助块 → IDAT（顺序）→ IEND
 - **文件覆盖：** 检查 IEND 后是否有附加的归档文件，可能覆盖魔数
-- **APNG 帧提取：** 动画 PNG 有多帧；用 `apngdis` 提取或解析 `fdAT`/`fcTL` 块。详见 [steganography.md](steganography.md#apng-animated-png-frame-extraction-icectf-2016)。
-- **PNG 高度/CRC 操作：** 修改 IHDR 高度字段，暴力破解直到 CRC 匹配以揭示隐藏行。详见 [steganography.md](steganography.md#png-heightcrc-manipulation-for-hidden-content-h4ckit-ctf-2016)。
+- **APNG 帧提取：** 动画 PNG 有多帧；用 `apngdis` 提取或解析 `fdAT`/`fcTL` 块。详见 [steganography.md](steganography.md#apng动画-png帧提取-icectf-2016)。
+- **PNG 高度/CRC 操作：** 修改 IHDR 高度字段，暴力破解直到 CRC 匹配以揭示隐藏行。详见 [steganography.md](steganography.md#png-高度crc-操作隐藏内容-h4ckit-ctf-2016)。
 - **像素坐标链隐写：** 链表遍历，R=数据字节，G/B=下一个像素坐标。详见 [stego-image.md](stego-image.md#pixel-coordinate-chain-steganography-h4ckit-ctf-2016)。
-- **AVI 帧差分：** 异或连续视频帧，揭示像素差异中的隐藏数据。详见 [stego-image.md](stego-image.md#avi-frame-differential-pixel-steganography-h4ckit-ctf-2016)。
+- **AVI 帧差分：** 异或连续视频帧，揭示像素差异中的隐藏数据。详见 [stego-image.md](stego-image.md#avi-帧差分像素隐写术-h4ckit-ctf-2016)。
 
 - **自定义频率 DTMF：** 非标准双音频率；先生成频谱图（`ffmpeg -i audio -lavfi showspectrumpic`），映射自定义网格到键盘数字，解码可变长度 ASCII
 - **JPEG DQT LSB：** 未使用的量化表（ID 2、3）携带 LSB 编码数据；通过 `Image.open().quantization` 访问并提取每个 64 值的第 0 位
@@ -254,9 +254,9 @@ WMI 存储库分析详情请参见 [windows.md](windows.md)。
 - **PCAP 中的 NTLMv2：** 从 NTLMSSP_AUTH 中提取服务器挑战 + NTProofStr + blob，进行暴力破解
 - **WPA/WEP WiFi 解密：** `aircrack-ng -w wordlist capture.pcap` 破解 WPA 握手；WEP 通过足够 IV 破解。详见 [network.md](network.md#wpawep-wifi-decryption-from-pcap-defcamp-ctf-2016)。
 - **PCAP 修复：** `pcapfix -d corrupted.pcap` 修复损坏的 PCAP 头/校验和以供 Wireshark 加载。详见 [network.md](network.md#corrupted-pcap-repair-with-pcapfix-csaw-ctf-2016)。
-- **USB HID 键盘解码：** 从 USB 捕获中提取 8 字节 HID 报告；字节 2 = 键码，字节 0 = 修饰符（Shift）。详见 [peripheral-capture.md](peripheral-capture.md#usb-hid-keyboard-capture-decoding-ekoparty-ctf-2016)。
+- **USB HID 键盘解码：** 从 USB 捕获中提取 8 字节 HID 报告；字节 2 = 键码，字节 0 = 修饰符（Shift）。详见 [peripheral-capture.md](peripheral-capture.md#usb-hid-键盘捕获解码-ekoparty-ctf-2016)。
 - **dnscat2 重组：** 解码十六进制/base32 子域标签，剥离 9 字节 dnscat2 头，去重重传，重组负载。详见 [network-advanced.md](network-advanced.md#dnscat2-traffic-reassembly-from-dns-pcap-bsidessf-2017)。
-- **USB 键盘 LED 渗漏：** 主机到设备的 HID SET_REPORT 包切换大写锁定 LED，时序编码摩尔斯码。详见 [peripheral-capture.md](peripheral-capture.md#usb-keyboard-led-morse-code-exfiltration-bitsctf-2017)。
+- **USB 键盘 LED 渗漏：** 主机到设备的 HID SET_REPORT 包切换大写锁定 LED，时序编码摩尔斯码。详见 [peripheral-capture.md](peripheral-capture.md#usb-键盘-led-摩尔斯码外泄-bitsctf-2017)。
 
 SMB3 解密、凭证提取请参见 [network.md](network.md)，完整 TLS/TFTP/USB 工作流请参见 [linux-forensics.md](linux-forensics.md)。
 
@@ -271,34 +271,34 @@ SMB3 解密、凭证提取请参见 [network.md](network.md)，完整 TLS/TFTP/U
 
 - **Docker 镜像取证：** 配置 JSON 保留所有 `RUN` 命令，即使清理后仍然存在。`tar xf app.tar` 后检查配置 blob。详见 [linux-forensics.md](linux-forensics.md)。
 - **Linux 攻击链：** 检查 `auth.log`、`.bash_history`、最近的二进制文件、PCAP。详见 [linux-forensics.md](linux-forensics.md)。
-- **RAID 5 XOR 恢复：** 三盘 RAID 5 中两盘 → 字节异或恢复第三盘：`bytes(a ^ b for a, b in zip(disk1, disk3))`。详见 [disk-advanced.md](disk-advanced.md#raid-5-disk-recovery-via-xor-crypto-cat)。
-- **GIMP 原始内存转储可视化检查：** Volatility 失败时，将 `.dmp` 以原始 RGB 数据打开，宽度约为显示器宽度（~1920）；滚动查找用户桌面帧缓冲截图。详见 [disk-and-memory.md](disk-and-memory.md#gimp-raw-memory-dump-visual-inspection-inshack-2018)。
-- **Kyoto Cabinet 哈希数据库取证：** 通过插入顺序探针键并二进制差异比较，恢复零键的键排序，找出每个哈希槽被覆盖的键。详见 [disk-advanced.md](disk-advanced.md#kyoto-cabinet-hash-database-forensics-via-incremental-key-insertion-asis-ctf-2018)。
+- **RAID 5 XOR 恢复：** 三盘 RAID 5 中两盘 → 字节异或恢复第三盘：`bytes(a ^ b for a, b in zip(disk1, disk3))`。详见 [disk-advanced.md](disk-advanced.md#通过-xor-恢复-raid-5-磁盘-crypto-cat)。
+- **GIMP 原始内存转储可视化检查：** Volatility 失败时，将 `.dmp` 以原始 RGB 数据打开，宽度约为显示器宽度（~1920）；滚动查找用户桌面帧缓冲截图。详见 [disk-and-memory.md](disk-and-memory.md#gimp-原始内存转储可视化检查inshack-2018)。
+- **Kyoto Cabinet 哈希数据库取证：** 通过插入顺序探针键并二进制差异比较，恢复零键的键排序，找出每个哈希槽被覆盖的键。详见 [disk-advanced.md](disk-advanced.md#通过增量键插入进行-kyoto-cabinet-哈希数据库取证asis-ctf-2018)。
 - **PowerShell 勒索软件：** 从 minidump 提取脚本，找到 AES 密钥，解密 SMTP 附件。详见 [disk-and-memory.md](disk-and-memory.md)。
 - **Linux 勒索软件 + 内存转储：** Volatility 不可靠时，通过原始内存候选扫描和魔数验证恢复 AES 密钥；重新干净提取 zip 以避免漏文件/误报。详见 [disk-advanced.md](disk-advanced.md)。
 - **已删除分区：** 使用 `testdisk` 或 `kpartx -av`。详见 [disk-advanced.md](disk-advanced.md)。
 - **ZFS 取证：** 重建标签、Fletcher4 校验和、PBKDF2 破解。详见 [disk-advanced.md](disk-advanced.md)。
-- **BSON 重组：** 从原始字节重组 BSON（二进制 JSON）文档；使用 Python `bson` 库解析。详见 [disk-and-memory.md](disk-and-memory.md#bson-binary-json-format-reconstruction-icectf-2016)。
-- **TrueCrypt 挂载：** 使用已知密码挂载 TrueCrypt/VeraCrypt 卷，命令 `veracrypt --mount` 或 `cryptsetup open --type tcrypt`。详见 [disk-and-memory.md](disk-and-memory.md#truecrypt--veracrypt-volume-mounting-grehack-ctf-2016)。
+- **BSON 重组：** 从原始字节重组 BSON（二进制 JSON）文档；使用 Python `bson` 库解析。详见 [disk-and-memory.md](disk-and-memory.md#bson二进制-json格式重构icectf-2016)。
+- **TrueCrypt 挂载：** 使用已知密码挂载 TrueCrypt/VeraCrypt 卷，命令 `veracrypt --mount` 或 `cryptsetup open --type tcrypt`。详见 [disk-and-memory.md](disk-and-memory.md#truecrypt--veracrypt-卷挂载grehack-ctf-2016)。
 - **硬件信号：** VGA/HDMI TMDS/DisplayPort，Voyager 音频，Saleae UART 解码，Flipper Zero。详见 [signals-and-hardware.md](signals-and-hardware.md)。
-- **视频中的大写锁定 LED 摩尔斯码：** 使用 OpenCV 跟踪监控摄像头帧中的大写锁定 LED 像素；开/关时长编码摩尔斯码（短点=点，长划=划）。详见 [signals-and-hardware.md](signals-and-hardware.md#caps-lock-led-morse-code-extraction-from-video-stem-ctf-2018)。
+- **视频中的大写锁定 LED 摩尔斯码：** 使用 OpenCV 跟踪监控摄像头帧中的大写锁定 LED 像素；开/关时长编码摩尔斯码（短点=点，长划=划）。详见 [signals-and-hardware.md](signals-and-hardware.md#caps-lock-led-摩尔斯码提取stem-ctf-2018)。
 - **I2C 协议解码：** 解码 I2C 总线捕获（SDA/SCL 线）以提取 EEPROM 或传感器通信数据。详见 [signals-and-hardware.md](signals-and-hardware.md#i2c-bus-protocol-decoding-ekoparty-ctf-2016)。
 - **穿孔卡 OCR：** 通过映射孔位到字符，使用标准编码网格解码 IBM-29 穿孔卡图像。详见 [signals-and-hardware.md](signals-and-hardware.md#ibm-29-punched-card-ocr-ekoparty-ctf-2016)。
-- **USB HID 鼠标绘图：** 按绘图模式渲染相对 HID 移动为位图；分离模式，跳过笔抬起，缩放 5-8 倍。详见 [peripheral-capture.md](peripheral-capture.md#usb-hid-mousepen-drawing-recovery-ehax-2026)。
+- **USB HID 鼠标绘图：** 按绘图模式渲染相对 HID 移动为位图；分离模式，跳过笔抬起，缩放 5-8 倍。详见 [peripheral-capture.md](peripheral-capture.md#usb-hid-鼠标笔绘图恢复-ehax-2026)。
 - **侧信道功率分析：** 多维功率轨迹（位置 × 猜测 × 轨迹 × 采样）。对轨迹求平均，找最大方差采样点，选择泄漏点最大功率的猜测。详见 [signals-and-hardware.md](signals-and-hardware.md)。
 - **包间隔时序：** 二进制数据编码为 PCAP 中包间延迟。两个间隔值对应两个比特值。详见 [network-advanced.md](network-advanced.md)。
-- **BMP 位平面二维码：** 使用 NumPy 提取每个 RGB 通道的 0-2 位平面；隐藏二维码通常在位 1（非位 0）。详见 [stego-image.md](stego-image.md#bmp-bitplane-qr-code-extraction--steghide-bypass-ctf-2025)。
-- **图像拼图重组：** 通过拼块边缘像素差匹配，贪心放置到网格。详见 [stego-image.md](stego-image.md#image-jigsaw-puzzle-reassembly-via-edge-matching-bypass-ctf-2025)。
-- **DeepSound 音频隐写及密码破解：** 使用 `deepsound2john.py` 提取哈希，用 John 破解，从 WAV 中恢复隐藏文件；始终检查频谱图和 DeepSound。详见 [stego-advanced.md](stego-advanced.md#deepsound-audio-steganography-with-password-cracking-inshack-2018)。
-- **曲面反射中的二维码重建：** 手动从视频中玻璃球反射重建二维码；翻转、去畸变，使用已知明文前缀修正前几字节，高纠错码修正其余。详见 [steganography.md](steganography.md#qr-code-reconstruction-from-curved-glass-reflection-in-video-plaidctf-2018)。
+- **BMP 位平面二维码：** 使用 NumPy 提取每个 RGB 通道的 0-2 位平面；隐藏二维码通常在位 1（非位 0）。详见 [stego-image.md](stego-image.md#bmp-位平面二维码提取--steghidebypass-ctf-2025)。
+- **图像拼图重组：** 通过拼块边缘像素差匹配，贪心放置到网格。详见 [stego-image.md](stego-image.md#通过边缘匹配重组拼图图像bypass-ctf-2025)。
+- **DeepSound 音频隐写及密码破解：** 使用 `deepsound2john.py` 提取哈希，用 John 破解，从 WAV 中恢复隐藏文件；始终检查频谱图和 DeepSound。详见 [stego-advanced.md](stego-advanced.md#deepsound-音频隐写与密码破解-inshack-2018)。
+- **曲面反射中的二维码重建：** 手动从视频中玻璃球反射重建二维码；翻转、去畸变，使用已知明文前缀修正前几字节，高纠错码修正其余。详见 [steganography.md](steganography.md#视频中曲面玻璃反射的二维码重建-plaidctf-2018)。
 - **音频 FFT 笔记：** 主导频率 → 音符名称（A-G）拼写单词。详见 [stego-advanced.md](stego-advanced.md)。
 - **音频元数据八进制：** Exiftool 注释中下划线分隔的八进制数字 → 解码为 ASCII/base64。详见 [stego-advanced.md](stego-advanced.md)。
 - **G-code 可视化：** 侧投影（XZ/YZ）显示文本。详见 [3d-printing.md](3d-printing.md)。
 - **Git 目录恢复：** 使用 `gitdumper.sh` 恢复暴露的 `.git` 目录。详见 [linux-forensics.md](linux-forensics.md)。
 - **KeePass v4 破解：** 标准 `keepass2john` 不支持 v4/Argon2；使用 `ivanmrsulja/keepass2john` 分支或 `keepass4brute`。用 `cewl` 生成字典。详见 [linux-forensics.md](linux-forensics.md)。
 - **跨通道多比特 LSB：** 不同 RGB 通道的不同位位置（R[0], G[1], B[2]）编码隐藏数据。详见 [stego-advanced.md](stego-advanced.md)。
-- **F5 JPEG DCT 检测：** ±1 与 ±2 AC 系数比率从约 3:1 降至约 1:1；稀疏图像需次级 ±2/±3 指标。详见 [stego-image.md](stego-image.md#f5-jpeg-dct-coefficient-ratio-detection-apoorvctf-2026)。
-- **PNG 未使用调色板隐写：** 未被像素引用的 PLTE 条目在红色通道值中携带隐藏数据。详见 [stego-image.md](stego-image.md#png-unused-palette-entry-steganography-apoorvctf-2026)。
+- **F5 JPEG DCT 检测：** ±1 与 ±2 AC 系数比率从约 3:1 降至约 1:1；稀疏图像需次级 ±2/±3 指标。详见 [stego-image.md](stego-image.md#f5-jpeg-dct-系数比率检测-apoorvctf-2026)。
+- **PNG 未使用调色板隐写：** 未被像素引用的 PLTE 条目在红色通道值中携带隐藏数据。详见 [stego-image.md](stego-image.md#png-未使用调色板条目隐写-apoorvctf-2026)。
 - **键盘声学侧信道：** 从击键音频提取 MFCC 特征 + KNN 分类对比标记参考。10ms 窗口捕获冲击瞬态。详见 [signals-and-hardware.md](signals-and-hardware.md)。
 - **TCP 标志隐蔽通道：** 6 个 TCP 标志位（FIN/SYN/RST/PSH/ACK/URG）= 0-63 值，编码 base64 字符。固定目标端口上的无意义标志组合即隐蔽数据。详见 [network-advanced.md](network-advanced.md)。
 - **Brotli 解压炸弹缝隙：** 压缩炸弹有重复块；flag 在缝隙处打破模式。比较相邻块找不连续，只解压该区域。详见 [network-advanced.md](network-advanced.md)。
@@ -306,47 +306,47 @@ SMB3 解密、凭证提取请参见 [network.md](network.md)，完整 TLS/TFTP/U
 - **DNS 尾部字节二进制：** DNS 查询结构后附加额外字节（`0x30`/`0x31`）编码二进制位；8 位 MSB 优先块 → ASCII。详见 [network-advanced.md](network-advanced.md)。
 - **伪 TLS + mDNS 密钥 + 可打印字符合并：** 伪装成 TLS 的 TCP 流隐藏 ZIP；用 mDNS TXT 记录的 XOR 密钥解密；通过选择可打印字符合并两个解密数组。详见 [network-advanced.md](network-advanced.md)。
 - **基于种子的像素置换隐写（Seed-based pixel permutation stego）：** 确定性像素洗牌（使用已知种子的 Fisher-Yates 算法）+ 从 Y 通道多位平面交错的 LSB 提取 → 隐藏的二维码。详见 [stego-image.md](stego-image.md#seed-based-pixel-permutation--multi-bitplane-qr-l3m0nctf-2025)。
-- **BTRFS 快照恢复（BTRFS snapshot recovery）：** 被删除的文件在 BTRFS 快照/备用子卷中依然存在。使用 `mount -o subvol=@backup` 访问历史副本。详见 [disk-recovery.md](disk-recovery.md#btrfs-subvolumesnapshot-recovery-bsidessf-2026)。
-- **JPEG XL TOC 置换（JPEG XL TOC permutation）：** JXL 的渐进式 TOC 置换控制部分解码时的图块收敛顺序。截断到不同偏移，测量哪些图块先收敛 → 收敛顺序编码 flag。详见 [stego-advanced-2.md](stego-advanced-2.md#jpeg-xl-toc-permutation-steganography-bsidessf-2026)。
+- **BTRFS 快照恢复（BTRFS snapshot recovery）：** 被删除的文件在 BTRFS 快照/备用子卷中依然存在。使用 `mount -o subvol=@backup` 访问历史副本。详见 [disk-recovery.md](disk-recovery.md#btrfs-子卷快照恢复bsidessf-2026)。
+- **JPEG XL TOC 置换（JPEG XL TOC permutation）：** JXL 的渐进式 TOC 置换控制部分解码时的图块收敛顺序。截断到不同偏移，测量哪些图块先收敛 → 收敛顺序编码 flag。详见 [stego-advanced-2.md](stego-advanced-2.md#jpeg-xl-toc-排列隐写bsidessf-2026)。
 - **Kitty 终端图形（Kitty terminal graphics）：** `ESC_G` 协议以 base64 分块嵌入 zlib 压缩的 RGB 图像数据。剥离转义序列，拼接，解压，重建图像。详见 [steganography.md](steganography.md#kitty-terminal-graphics-protocol-decoding-bsidessf-2026)。
 - **ANSI 转义序列隐写（ANSI escape sequence stego）：** flag 文本交错在 ANSI 颜色码和盲文字符之间。渲染时不可见；通过剥离转义序列和非 ASCII 字符提取。详见 [steganography.md](steganography.md#ansi-escape-sequence-steganography-in-terminal-art-bsidessf-2026)。
 - **自动立体图解法（Autostereogram solving）：** 复制图层，差值混合，水平平移约 100 像素以显示隐藏的 3D 文字。详见 [steganography.md](steganography.md#autostereogram--magic-eye-solving-bsidessf-2026)。
-- **双层字节+行交错（Two-layer byte+line interleaving）：** 两个文件先字节交错，再扫描线交错。先反交错偶数/奇数字节（得到有效图像），再反交错偶数/奇数行。详见 [steganography.md](steganography.md#two-layer-byteline-interleaving-bsidessf-2026)。
-- **SMB RID 重用（SMB RID recycling）：** 访客认证 + LSARPC 的 `LsaLookupSids` 通过递增 RID 从 PCAP 中枚举 AD 账户。详见 [network-advanced.md](network-advanced.md#smb-rid-recycling-via-lsarpc-midnight-2026)。
+- **双层字节+行交错（Two-layer byte+line interleaving）：** 两个文件先字节交错，再扫描线交错。先反交错偶数/奇数字节（得到有效图像），再反交错偶数/奇数行。详见 [steganography.md](steganography.md#ansi-escape-sequence-steganography-in-terminal-art-bsidessf-2026)。
+- **SMB RID 重用（SMB RID recycling）：** 访客认证 + LSARPC 的 `LsaLookupSids` 通过递增 RID 从 PCAP 中枚举 AD 账户。详见 [network-advanced.md](network-advanced.md#通过-lsarpc-的-smb-rid-循环-midnight-2026)。
 - **时间烤（Timeroasting，MS-SNTP）：** 使用机器 RID 的 NTP 请求从 DC 提取 HMAC-MD5 哈希；用 hashcat -m 31300 破解。详见 [network-advanced.md](network-advanced.md#timeroasting--ms-sntp-hash-extraction-midnight-2026)。
-- **Android 取证（Android forensics）：** 使用 `adb pull` 导出 APK，使用 `apktool` 分析，检查 `/data/data/<package>/` 下的 `shared_prefs/` 和 SQLite 数据库。详见 [disk-and-memory.md](disk-and-memory.md#android-forensics)。
-- **Docker 容器取证（Docker container forensics）：** `docker save` 导出分层 tar 包；被删除文件仍存在于早期层。`docker history --no-trunc` 显示构建秘密。详见 [disk-and-memory.md](disk-and-memory.md#container-forensics-docker)。
-- **云存储取证（Cloud storage forensics）：** S3/GCP/Azure 版本控制保留已删除对象。使用 `list-object-versions` 恢复已删除 flag。详见 [disk-and-memory.md](disk-and-memory.md#cloud-storage-forensics-aws-s3--gcp--azure)。
-- **APFS 快照恢复（APFS snapshot recovery）：** 写时复制文件系统在快照中保留历史文件状态；使用 `icat` 结合不同 XID 块偏移读取跨事务 ID 的 inode。详见 [disk-advanced.md](disk-advanced.md#apfs-snapshot-historical-file-recovery-srdnlenctf-2026)。
-- **Windows KAPE 初步分析（Windows KAPE triage）：** 预收集的工件 ZIP；从 PowerShell 历史 → Amcache → MFT → 注册表配置单元开始分析。详见 [disk-and-memory.md](disk-and-memory.md#windows-kape-triage-analysis-utctf-2026)。
-- **WordPerfect 宏 XOR（WordPerfect macro XOR）：** `.wcm` 文件包含嵌入加密数据的宏；XOR 公式 `(a+b)-2*(a&b)` 等价于按位异或。详见 [disk-advanced.md](disk-advanced.md#wordperfect-macro-xor-extraction-srdnlenctf-2026)。
-- **从 coredump 提取 TLS 主密钥（TLS master key from coredump）：** 在 coredump 中搜索会话 ID（来自 Wireshark 握手）；读取其前 48 字节作为主密钥。创建 Wireshark 预主密钥日志文件。详见 [network.md](network.md#tls-master-key-extraction-from-coredump-plaidctf-2014)。
-- **损坏的 git blob 修复（Corrupted git blob repair）：** 单字节损坏导致 SHA-1 变化；对每个字节位置暴力尝试（256 × 文件大小），用 `git hash-object` 验证。详见 [linux-forensics.md](linux-forensics.md#corrupted-git-blob-repair-via-byte-brute-force-csaw-ctf-2015)。
+- **Android 取证（Android forensics）：** 使用 `adb pull` 导出 APK，使用 `apktool` 分析，检查 `/data/data/<package>/` 下的 `shared_prefs/` 和 SQLite 数据库。详见 [disk-and-memory.md](disk-and-memory.md#android-取证)。
+- **Docker 容器取证（Docker container forensics）：** `docker save` 导出分层 tar 包；被删除文件仍存在于早期层。`docker history --no-trunc` 显示构建秘密。详见 [disk-and-memory.md](disk-and-memory.md#容器取证docker)。
+- **云存储取证（Cloud storage forensics）：** S3/GCP/Azure 版本控制保留已删除对象。使用 `list-object-versions` 恢复已删除 flag。详见 [disk-and-memory.md](disk-and-memory.md#云存储取证aws-s3--gcp--azure)。
+- **APFS 快照恢复（APFS snapshot recovery）：** 写时复制文件系统在快照中保留历史文件状态；使用 `icat` 结合不同 XID 块偏移读取跨事务 ID 的 inode。详见 [disk-advanced.md](disk-advanced.md#apfs-快照历史文件恢复-srdnlenctf-2026)。
+- **Windows KAPE 初步分析（Windows KAPE triage）：** 预收集的工件 ZIP；从 PowerShell 历史 → Amcache → MFT → 注册表配置单元开始分析。详见 [disk-and-memory.md](disk-and-memory.md#windows-kape-初筛分析utctf-2026)。
+- **WordPerfect 宏 XOR（WordPerfect macro XOR）：** `.wcm` 文件包含嵌入加密数据的宏；XOR 公式 `(a+b)-2*(a&b)` 等价于按位异或。详见 [disk-advanced.md](disk-advanced.md#wordperfect-宏-xor-提取-srdnlenctf-2026)。
+- **从 coredump 提取 TLS 主密钥（TLS master key from coredump）：** 在 coredump 中搜索会话 ID（来自 Wireshark 握手）；读取其前 48 字节作为主密钥。创建 Wireshark 预主密钥日志文件。详见 [network.md](network.md#从-coredump-中提取-tls-主密钥plaidctf-2014)。
+- **损坏的 git blob 修复（Corrupted git blob repair）：** 单字节损坏导致 SHA-1 变化；对每个字节位置暴力尝试（256 × 文件大小），用 `git hash-object` 验证。详见 [linux-forensics.md](linux-forensics.md#通过字节暴力破解修复损坏的-git-blobcsaw-ctf-2015)。
 - **从 PCAP 重组分割归档（Split archive reassembly from PCAP）：** 同尺寸 HTTP 传输文件，MD5 哈希命名，是归档碎片；按 Apache 目录列表时间排序，拼接，从 TCP 聊天流提取密码。详见 [network.md](network.md#split-archive-reassembly-from-http-transfers-asis-ctf-finals-2013)。
-- **视频帧累积（Video frame accumulation）：** 视频中不同位置闪烁图像；合成所有帧（逐像素取最大值）显示隐藏二维码或图像。详见 [stego-advanced-2.md](stego-advanced-2.md#video-frame-accumulation-for-hidden-image-asis-ctf-finals-2013)。
-- **反转音频（Reversed audio）：** 听起来像语音的杂乱音频倒放；使用 `sox audio.wav reversed.wav reverse` 或 Audacity 效果 → 反转揭示隐藏信息。详见 [stego-advanced-2.md](stego-advanced-2.md#reversed-audio-hidden-message-asis-ctf-finals-2013)。
-- **多流视频容器隐写（Multi-stream video container stego）：** MP4/MKV 含多视频流；默认流是迷惑，flag 在次要流。用 `ffprobe -hide_banner file.mp4` 枚举，`ffmpeg -i file.mp4 -map 0:1 -frames:v 1 flag.jpg` 提取。详见 [steganography.md](steganography.md#multi-stream-video-container-steganography-bsidessf-2026)。
-- **FAT16 空闲空间恢复（FAT16 free space recovery）：** flag 隐藏在 FAT16 文件系统未分配簇中。解析 FAT 表，枚举空闲簇（条目=0x0000），读取数据区。详见 [disk-recovery.md](disk-recovery.md#fat16-free-space-data-recovery-bsidessf-2026)。
-- **FAT16 删除文件恢复（fls/icat）（FAT16 deleted file recovery）：** FAT 删除时目录项首字节替换为 `0xE5`，但数据仍在。用 `fls -r -d image.img` 列出删除项，`icat image.img <inode>` 按 inode 恢复。详见 [disk-recovery.md](disk-recovery.md#fat16-deleted-file-recovery-via-sleuth-kit-metactf-flash-2026)。
-- **Ext2 孤立 inode 恢复（Ext2 orphaned inode recovery）：** 删除文件留下孤立 inode；用 `e2fsck -y disk.img` 连接到 `/lost+found`。也可用 `debugfs` 的 `lsdel` 或 `icat`。详见 [disk-recovery.md](disk-recovery.md#ext2-orphaned-inode-recovery-via-fsck-bsidessf-2026)。
+- **视频帧累积（Video frame accumulation）：** 视频中不同位置闪烁图像；合成所有帧（逐像素取最大值）显示隐藏二维码或图像。详见 [stego-advanced-2.md](stego-advanced-2.md#视频帧累积隐藏图像asis-ctf-finals-2013)。
+- **反转音频（Reversed audio）：** 听起来像语音的杂乱音频倒放；使用 `sox audio.wav reversed.wav reverse` 或 Audacity 效果 → 反转揭示隐藏信息。详见 [stego-advanced-2.md](stego-advanced-2.md#反转音频隐藏信息asis-ctf-finals-2013)。
+- **多流视频容器隐写（Multi-stream video container stego）：** MP4/MKV 含多视频流；默认流是迷惑，flag 在次要流。用 `ffprobe -hide_banner file.mp4` 枚举，`ffmpeg -i file.mp4 -map 0:1 -frames:v 1 flag.jpg` 提取。详见 [steganography.md](steganography.md#ansi-escape-sequence-steganography-in-terminal-art-bsidessf-2026)。
+- **FAT16 空闲空间恢复（FAT16 free space recovery）：** flag 隐藏在 FAT16 文件系统未分配簇中。解析 FAT 表，枚举空闲簇（条目=0x0000），读取数据区。详见 [disk-recovery.md](disk-recovery.md#fat16-空闲空间数据恢复bsidessf-2026)。
+- **FAT16 删除文件恢复（fls/icat）（FAT16 deleted file recovery）：** FAT 删除时目录项首字节替换为 `0xE5`，但数据仍在。用 `fls -r -d image.img` 列出删除项，`icat image.img <inode>` 按 inode 恢复。详见 [disk-recovery.md](disk-recovery.md#通过-sleuth-kit-恢复-fat16-已删除文件metactf-flash-2026)。
+- **Ext2 孤立 inode 恢复（Ext2 orphaned inode recovery）：** 删除文件留下孤立 inode；用 `e2fsck -y disk.img` 连接到 `/lost+found`。也可用 `debugfs` 的 `lsdel` 或 `icat`。详见 [disk-recovery.md](disk-recovery.md#通过-fsck-恢复-ext2-孤立-inodebsidessf-2026)。
 - **Linux input_event 键盘记录解析（Linux input_event keylogger parsing）：** 24 字节 `struct input_event` 二进制转储；过滤 `type==1`（EV_KEY）、`value==1`（按下），通过 `input-event-codes.h` 映射键码。详见 [signals-and-hardware.md](signals-and-hardware.md#linux-input_event-keylogger-dump-parsing-pwn2win-2016)。
-- **VBA 宏单元格数据转二进制（VBA macro cell data to binary）：** Excel 单元格含数值；VBA `CByte((val-78)/3)` 转换为 ELF 字节。用 Python 重写，切勿运行宏。详见 [linux-forensics.md](linux-forensics.md#vba-macro-forensics---excel-cell-data-to-elf-binary-sharif-ctf-2016)。
+- **VBA 宏单元格数据转二进制（VBA macro cell data to binary）：** Excel 单元格含数值；VBA `CByte((val-78)/3)` 转换为 ELF 字节。用 Python 重写，切勿运行宏。详见 [linux-forensics.md](linux-forensics.md#vba-宏取证---excel-单元格数据转-elf-二进制sharif-ctf-2016)。
 - **RGB 奇偶隐写（RGB parity steganography）：** 每像素 R+G+B 求和；偶数为白，奇数为黑，渲染隐藏二进制位图。详见 [stego-image.md](stego-image.md#rgb-parity-steganography-break-in-2016)。
 - **隐藏 PDF 对象（Hidden PDF objects）：** 未被引用的内容流对象不在 `/Kids` 数组中。添加到 `/Kids`，递增 `/Count`，重新渲染。详见 [network-advanced.md](network-advanced.md#unreferenced-pdf-objects-with-hidden-pages-sharifctf-7-2016)。
-- **Arnold 猫映射解扰（Arnold's Cat Map descrambling）：** 方形图像的周期性混沌变换；迭代正向映射直到恢复原图。周期整除 `3*N`。详见 [stego-advanced-2.md](stego-advanced-2.md#arnolds-cat-map-image-descrambling-nuit-du-hack-2017)。
-- **Python 内存中源码恢复（Python in-memory source recovery）：** 附加 `pyrasite-shell` 到运行中的 Python 进程，使用 `uncompyle6`（Python ≤3.8）或 `pycdc`（Python 3.9+）反编译 `func_code` 对象，导出 `globals()` 查找秘密。详见 [linux-forensics.md](linux-forensics.md#python-in-memory-source-recovery-via-pyrasite-insomnihack-2017)。
-- **HFS+ 资源分支恢复（HFS+ resource fork recovery）：** HFS+ 资源分支中隐藏数据，`binwalk`/`foremost` 无法检测；用 HFSExplorer + 010 Editor HFS 模板提取范围记录。详见 [disk-advanced.md](disk-advanced.md#hfs-resource-fork-hidden-binary-recovery-confidence-ctf-2017)。
+- **Arnold 猫映射解扰（Arnold's Cat Map descrambling）：** 方形图像的周期性混沌变换；迭代正向映射直到恢复原图。周期整除 `3*N`。详见 [stego-advanced-2.md](stego-advanced-2.md#arnolds-cat-map-图像解扰-nuit-du-hack-2017)。
+- **Python 内存中源码恢复（Python in-memory source recovery）：** 附加 `pyrasite-shell` 到运行中的 Python 进程，使用 `uncompyle6`（Python ≤3.8）或 `pycdc`（Python 3.9+）反编译 `func_code` 对象，导出 `globals()` 查找秘密。详见 [linux-forensics.md](linux-forensics.md#通过-pyrasite-恢复-python-内存中的源代码insomnihack-2017)。
+- **HFS+ 资源分支恢复（HFS+ resource fork recovery）：** HFS+ 资源分支中隐藏数据，`binwalk`/`foremost` 无法检测；用 HFSExplorer + 010 Editor HFS 模板提取范围记录。详见 [disk-advanced.md](disk-advanced.md#hfs-资源分支隐藏二进制恢复confidence-ctf-2017)。
 - **WAV 音频中的串口 UART（Serial UART from WAV audio）：** 音频中的方波编码 UART 串口数据；确定波特率，解析起始/停止位，解码 LSB 优先的字节帧。详见 [signals-and-hardware.md](signals-and-hardware.md#serial-uart-data-decoding-from-wav-audio-easyctf-2017)。
-- **高分辨率 SSTV 解调（High-resolution SSTV demodulation）：** 标准 SSTV 解码器无法处理高采样率录音；用手动 FM 解调结合 `arccos` + 微分实现。详见 [stego-advanced-2.md](stego-advanced-2.md#high-resolution-sstv-custom-fm-demodulation-plaidctf-2017)。
-- **损坏 ZIP 头修复（Corrupted ZIP header repair）：** 修正本地文件头（偏移 26）和中央目录（偏移 28）中的文件名长度字段；备选方案：在候选偏移暴力尝试原始 deflate 解压。详见 [disk-recovery.md](disk-recovery.md#corrupted-zip-repair-via-header-field-manipulation-plaidctf-2017)。
-- **SQLite 编辑历史重建（SQLite edit history reconstruction）：** 重放 SQLite 差异表中的插入/删除差异，重建文档每个中间状态；flag 可能曾被输入后删除。详见 [disk-advanced.md](disk-advanced.md#sqlite-edit-history-reconstruction-from-diff-table-google-ctf-2017)。
-- **MJPEG FFD9 尾随字节隐写（MJPEG FFD9 trailing byte stego）：** MJPEG 帧中 JPEG EOI 标记（FFD9）后多余字节形成隐蔽通道；按 FFD8 分割，提取 FFD9 后数据。详见 [stego-advanced-2.md](stego-advanced-2.md#mjpeg-extra-bytes-after-ffd9-steganography-polictf-2017)。
-- **USB MIDI Launchpad 网格重建（USB MIDI Launchpad grid reconstruction）：** USB PCAP 中的 MIDI Note On/Off 映射到 8x8 Launchpad 网格（`key = row*16 + col`）；从按键序列重建视觉图案。详见 [signals-and-hardware.md](signals-and-hardware.md#usb-midi-launchpad-traffic-reconstruction-sthack-2017)。
+- **高分辨率 SSTV 解调（High-resolution SSTV demodulation）：** 标准 SSTV 解码器无法处理高采样率录音；用手动 FM 解调结合 `arccos` + 微分实现。详见 [stego-advanced-2.md](stego-advanced-2.md#高分辨率-sstv-自定义-fm-解调-plaidctf-2017)。
+- **损坏 ZIP 头修复（Corrupted ZIP header repair）：** 修正本地文件头（偏移 26）和中央目录（偏移 28）中的文件名长度字段；备选方案：在候选偏移暴力尝试原始 deflate 解压。详见 [disk-recovery.md](disk-recovery.md#通过头字段修改修复损坏的-zipplaidctf-2017)。
+- **SQLite 编辑历史重建（SQLite edit history reconstruction）：** 重放 SQLite 差异表中的插入/删除差异，重建文档每个中间状态；flag 可能曾被输入后删除。详见 [disk-advanced.md](disk-advanced.md#通过-diff-表重建-sqlite-编辑历史google-ctf-2017)。
+- **MJPEG FFD9 尾随字节隐写（MJPEG FFD9 trailing byte stego）：** MJPEG 帧中 JPEG EOI 标记（FFD9）后多余字节形成隐蔽通道；按 FFD8 分割，提取 FFD9 后数据。详见 [stego-advanced-2.md](stego-advanced-2.md#mjpeg-ffd9-之后的额外字节隐写-polictf-2017)。
+- **USB MIDI Launchpad 网格重建（USB MIDI Launchpad grid reconstruction）：** USB PCAP 中的 MIDI Note On/Off 映射到 8x8 Launchpad 网格（`key = row*16 + col`）；从按键序列重建视觉图案。详见 [signals-and-hardware.md](signals-and-hardware.md#usb-midi-launchpad-流量重构sthack-2017)。
 ## 通过 LSARPC 的 SMB RID 重用（Midnight 2026）
 
 通过分析带有连续 RID 的 LSARPC `LsaLookupSids` 调用，从 PCAP 中枚举 AD 账户，前提是经过 Guest 认证。过滤条件：`dcerpc.cn_bind_to_str contains lsarpc`。
 
-完整的 RPC 调用序列和 Wireshark 过滤器请参见 [network-advanced.md](network-advanced.md#smb-rid-recycling-via-lsarpc-midnight-2026)。
+完整的 RPC 调用序列和 Wireshark 过滤器请参见 [network-advanced.md](network-advanced.md#通过-lsarpc-的-smb-rid-循环-midnight-2026)。
 
 ## Timeroasting / MS-SNTP 哈希提取（Midnight 2026）
 
@@ -362,7 +362,7 @@ hashcat -m 31300 -a 0 -O hashes.txt rockyou.txt --username
 
 ## PCAP 中的 HTTP 渗漏
 
-**快速路径：** 使用 `tshark --export-objects http,/tmp/objects` 可即时提取上传的文件。检查 multipart POST 上传、不寻常的 User-Agent 字符串以及渗漏的文件（带有 flag 文本的图片）。详见 [network.md](network.md#http-file-upload-exfiltration-in-pcap-metactf-2026)。
+**快速路径：** 使用 `tshark --export-objects http,/tmp/objects` 可即时提取上传的文件。检查 multipart POST 上传、不寻常的 User-Agent 字符串以及渗漏的文件（带有 flag 文本的图片）。详见 [network.md](network.md#pcap-中的-http-文件上传外泄metactf-2026)。
 
 ## 常见编码
 

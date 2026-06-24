@@ -146,20 +146,20 @@ ROP 链仍调用 `commit_creds(prepare_kernel_cred(0))` 并执行 `swapgs; iretq
 
 不返回用户态，直接用内核 ROP 链通过 `pop rax; pop rdi; mov [rdi], rax; ret` gadget 覆盖 `modprobe_path`。无需 KPTI 处理——写操作完全在内核上下文中完成。
 
-完整技术、触发序列和 ROP payload 见 [kernel.md - modprobe_path Overwrite](kernel.md#modprobe_path-overwrite)。
+完整技术、触发序列和 ROP payload 见 [kernel.md - modprobe_path Overwrite](kernel.md#modprobe_path-覆盖)。
 
 ### 方法 4：通过 ROP 修改 core_pattern
 
 类似方法 3，但覆盖 `core_pattern` 为管道命令（如 `"|/evil"`）。当任意进程崩溃时，内核以 root 权限执行管道程序。
 
-完整技术及如何查找 `core_pattern` 地址见 [kernel.md - core_pattern Overwrite](kernel.md#core_pattern-overwrite)。
+完整技术及如何查找 `core_pattern` 地址见 [kernel.md - core_pattern Overwrite](kernel.md#core_pattern-覆盖)。
 
 ---
 
 ## SMEP / SMAP 绕过
 
 **SMEP（Supervisor Mode Execution Prevention，监督模式执行防护）：** 阻止内核模式执行用户态页面。
-- **绕过：** 使用内核 ROP（kROP）链——所有 gadget 来自内核 `.text`。详见 [kernel.md - Kernel ROP](kernel.md#kernel-rop-with-prepare_kernel_cred--commit_creds)。
+- **绕过：** 使用内核 ROP（kROP）链——所有 gadget 来自内核 `.text`。详见 [kernel.md - Kernel ROP](kernel.md#使用-prepare_kernel_cred--commit_creds-的内核-rop)。
 
 **SMAP（Supervisor Mode Access Prevention，监督模式访问防护）：** 阻止内核模式访问用户态内存。
 - **绕过：** 使用堆驻留链的 kROP，或使用 `stac`/`clac` gadget 临时禁用 SMAP。
@@ -172,9 +172,9 @@ ROP 链仍调用 `commit_creds(prepare_kernel_cred(0))` 并执行 `swapgs; iretq
 
 | 保护机制 | 阻止内容 | 绕过方法 |
 |-----------|--------|--------|
-| SMEP | 内核执行用户态页面 | kROP（内核 ROP 链）——见 [kernel.md](kernel.md#kernel-rop-with-prepare_kernel_cred--commit_creds) |
+| SMEP | 内核执行用户态页面 | kROP（内核 ROP 链）——见 [kernel.md](kernel.md#使用-prepare_kernel_cred--commit_creds-的内核-rop) |
 | SMAP | 内核访问用户态内存 | 堆驻留链的 kROP，`stac`/`clac` gadget |
-| 无 SMEP/SMAP | （无阻止） | [ret2usr](kernel.md#ret2usr-no-smepsmap) —— 直接调用用户态提权函数 |
+| 无 SMEP/SMAP | （无阻止） | [ret2usr](kernel.md#ret2usr无-smepsmap) —— 直接调用用户态提权函数 |
 | KPTI | 内核页表隔离 | [跳板](#method-1-swapgs_restore-trampoline)、[信号处理器](#method-2-signal-handler-sigsegv)、[modprobe_path](#method-3-modprobe_path-via-rop)、[core_pattern](#method-4-core_pattern-via-rop) |
 
 详见 [KPTI 绕过方法](#kpti-bypass-methods) 获取带代码的详细绕过技术。

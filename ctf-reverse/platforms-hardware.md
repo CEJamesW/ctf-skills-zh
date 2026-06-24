@@ -52,7 +52,7 @@ for timestamp, gpio_state in sorted(gpio_log):
 
 ## RISC-V (Advanced)
 
-超出基础反汇编的内容见 [tools.md](tools.md#risc-v-binary-analysis-ehax-2026)。这里补充高级部分：
+超出基础反汇编的内容见 [tools.md](tools.md#risc-v-二进制分析-ehax-2026)。这里补充高级部分：
 
 ### Custom Extensions
 

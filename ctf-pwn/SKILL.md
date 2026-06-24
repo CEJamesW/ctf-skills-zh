@@ -159,25 +159,25 @@ bash -c '{ echo "cmd1"; echo "cmd2"; sleep 1; } | nc host port'
 
 通过 `puts@PLT(puts@GOT)` 泄漏 libc，返回 vuln，再第二阶段 `system("/bin/sh")`。完整两阶段 ret2libc 模式、泄漏解析和返回目标选择见 [rop-and-shellcode.md](rop-and-shellcode.md)。
 
-**DynELF libc 发现：** `pwntools.DynELF(leak_func, pointer_in_libc)` 能在远程环境中不知 libc 版本时解析符号。见 [rop-and-shellcode.md](rop-and-shellcode.md#dynelf-automated-libc-discovery-rc3-ctf-2016)。
+**DynELF libc 发现：** `pwntools.DynELF(leak_func, pointer_in_libc)` 能在远程环境中不知 libc 版本时解析符号。见 [rop-and-shellcode.md](rop-and-shellcode.md#dynelf-自动化-libc-发现rc3-ctf-2016)。
 
-**小缓冲区中的受限 shellcode：** 当缓冲区太小，使用 `< 20 bytes` 的 `read()` stub shellcode 拉取第二阶段完整 shellcode。见 [rop-and-shellcode.md](rop-and-shellcode.md#constrained-shellcode-in-small-buffers-tum-ctf-2016)。
+**小缓冲区中的受限 shellcode：** 当缓冲区太小，使用 `< 20 bytes` 的 `read()` stub shellcode 拉取第二阶段完整 shellcode。见 [rop-and-shellcode.md](rop-and-shellcode.md#小缓冲区内受限-shellcodetum-ctf-2016)。
 
 **原始 syscall ROP：** 若 `system()`/`execve()` 因 CET/IBT 崩溃，改用 libc 里的 `pop rax; ret` + `syscall; ret`。见 [rop-and-shellcode.md](rop-and-shellcode.md)。
 
-**ret2csu：** `__libc_csu_init` gadget 可控制 `rdx`、`rsi`、`edi` 并调用任意 GOT 函数，在无 libc gadget 时实现通用三参调用。见 [rop-and-shellcode.md](rop-and-shellcode.md#ret2csu--__libc_csu_init-gadgets-crypto-cat)。
+**ret2csu：** `__libc_csu_init` gadget 可控制 `rdx`、`rsi`、`edi` 并调用任意 GOT 函数，在无 libc gadget 时实现通用三参调用。见 [rop-and-shellcode.md](rop-and-shellcode.md#ret2csu--__libc_csu_init-gadgetscrypto-cat)。
 
-**坏字符 XOR 绕过：** 先用 key 对数据 XOR，再写到 `.data`，然后用 ROP gadget 原地 XOR 回来。可规避空字节、换行等过滤字符。见 [rop-and-shellcode.md](rop-and-shellcode.md#bad-character-bypass-via-xor-encoding-in-rop-crypto-cat)。
+**坏字符 XOR 绕过：** 先用 key 对数据 XOR，再写到 `.data`，然后用 ROP gadget 原地 XOR 回来。可规避空字节、换行等过滤字符。见 [rop-and-shellcode.md](rop-and-shellcode.md#通过-xor-编码绕过-rop-中的坏字符crypto-cat)。
 
-**非常规 gadget（BEXTR/XLAT/STOSB/PEXT）：** 当没有标准 `mov` 写 gadget 时，链式利用冷门 x86 指令逐字节写内存。见 [rop-and-shellcode.md](rop-and-shellcode.md#exotic-x86-gadgets--bextrxlatstosbpext-crypto-cat)。
+**非常规 gadget（BEXTR/XLAT/STOSB/PEXT）：** 当没有标准 `mov` 写 gadget 时，链式利用冷门 x86 指令逐字节写内存。见 [rop-and-shellcode.md](rop-and-shellcode.md#奇异的-x86-gadgets--bextrxlatstosbpextcrypto-cat)。
 
-**栈迁移（`xchg rax,esp`）：** 当溢出空间不足以容纳完整 ROP 链时，把栈指针换到可控 heap/buffer。需要先用 `pop rax; ret` 装载迁移地址。见 [rop-and-shellcode.md](rop-and-shellcode.md#stack-pivot-via-xchg-raxesp-crypto-cat)。
+**栈迁移（`xchg rax,esp`）：** 当溢出空间不足以容纳完整 ROP 链时，把栈指针换到可控 heap/buffer。需要先用 `pop rax; ret` 装载迁移地址。见 [rop-and-shellcode.md](rop-and-shellcode.md#通过-xchg-raxesp-实现栈枢轴crypto-cat)。
 
 **rdx 控制：** `puts()` 之后，rdx 常被破坏成 1。可用 libc 中的 `pop rdx; pop rbx; ret`，或重新进入二进制的 read 设置逻辑再栈迁移。见 [rop-and-shellcode.md](rop-and-shellcode.md)。
 
-**Canary XOR 尾声作 rdx 清零 gadget：** 当没有 `pop rdx; ret` 时，可跳到 canary 检查尾声 `xor rdx, fs:28h`；若 canary 完整，它会把 RDX 清零。见 [rop-and-shellcode.md](rop-and-shellcode.md#stack-canary-xor-epilogue-as-rdx-zeroing-gadget-volgactf-2017)。
+**Canary XOR 尾声作 rdx 清零 gadget：** 当没有 `pop rdx; ret` 时，可跳到 canary 检查尾声 `xor rdx, fs:28h`；若 canary 完整，它会把 RDX 清零。见 [rop-and-shellcode.md](rop-and-shellcode.md#栈-canary-xor-尾声作为-rdx-清零-gadgetvolgactf-2017)。
 
-**stub_execveat 作为 execve 替代：** 当没有 `pop rax; ret` 时，改用 `stub_execveat`（syscall 322/0x142）代替 `execve`，并精确发送 0x142 字节，让 `read()` 返回值设置 rax。见 [rop-and-shellcode.md](rop-and-shellcode.md#stub_execveat-syscall-as-execve-alternative-asis-ctf-2018)。
+**stub_execveat 作为 execve 替代：** 当没有 `pop rax; ret` 时，改用 `stub_execveat`（syscall 322/0x142）代替 `execve`，并精确发送 0x142 字节，让 `read()` 返回值设置 rax。见 [rop-and-shellcode.md](rop-and-shellcode.md#stub_execveat-系统调用作为-execve-替代方案asis-ctf-2018)。
 
 **Shell 交互：** `execve` 后先 `sleep(1)`，再 `sendline(b'cat /flag*')`。见 [rop-and-shellcode.md](rop-and-shellcode.md)。
 
@@ -187,7 +187,7 @@ bash -c '{ echo "cmd1"; echo "cmd2"; sleep 1; } | nc host port'
 
 ## Kernel Exploitation
 
-**通过 failed file open 绕过 addr_limit：** 当某内核模块把 `addr_limit = KERNEL_DS` 设上去，但错误路径没恢复时，制造错误（例如把目标文件换成目录）即可保留用户态对内核内存的 `read()`/`write()` 访问。见 [kernel-techniques.md](kernel-techniques.md#kernel-addr_limit-bypass-via-failed-file-open-midnight-sun-ctf-2018)。
+**通过 failed file open 绕过 addr_limit：** 当某内核模块把 `addr_limit = KERNEL_DS` 设上去，但错误路径没恢复时，制造错误（例如把目标文件换成目录）即可保留用户态对内核内存的 `read()`/`write()` 访问。见 [kernel-techniques.md](kernel-techniques.md#通过失败文件打开绕过内核-addr_limitmidnight-sun-ctf-2018)。
 
 ## Sandbox and Emulator Escape
 
@@ -195,9 +195,9 @@ bash -c '{ echo "cmd1"; echo "cmd2"; sleep 1; } | nc host port'
 
 ## Advanced Exploit Primitives
 
-**神经网络函数指针 OOB：** 当程序把神经网络输出当作函数指针数组索引，且没有边界检查时，可重新训练权重/偏置，使其产生越界索引，从偏置数组读取目标地址。见 [advanced-exploits-4.md](advanced-exploits-4.md#neural-network-output-as-function-pointer-index-oob-swampctf-2018)。
+**神经网络函数指针 OOB：** 当程序把神经网络输出当作函数指针数组索引，且没有边界检查时，可重新训练权重/偏置，使其产生越界索引，从偏置数组读取目标地址。见 [advanced-exploits-4.md](advanced-exploits-4.md#神经网络输出作为函数指针索引越界swampctf-2018)。
 
-**通过计数器溢出绕过 shellcode 唯一字节限制：** 当 shellcode 被限制为最多 N 种唯一字节时，可先喷栈破坏 `seen[256]` 计数器，再重跑 main（跳过 `memset`），利用计数器溢出让第二轮接受任意字节。见 [advanced-exploits-4.md](advanced-exploits-4.md#shellcode-unique-byte-limit-bypass-via-counter-overflow-blaze-ctf-2018)。
+**通过计数器溢出绕过 shellcode 唯一字节限制：** 当 shellcode 被限制为最多 N 种唯一字节时，可先喷栈破坏 `seen[256]` 计数器，再重跑 main（跳过 `memset`），利用计数器溢出让第二轮接受任意字节。见 [advanced-exploits-4.md](advanced-exploits-4.md#通过计数器溢出绕过-shellcode-唯一字节限制blaze-ctf-2018)。
 
 ## Deep-Dive Notes
 

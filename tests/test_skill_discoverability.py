@@ -118,6 +118,25 @@ TOKEN_ALIASES = {
     "vague": {"unknown", "unsure", "mystery", "suspicious"},
 }
 
+CHINESE_TOKEN_ALIASES = {
+    "http": ("网站", "网页", "接口", "浏览器", "管理面板"),
+    "xss": ("管理员机器人", "机器人", "cookie", "会话"),
+    "ssti": ("模板", "渲染"),
+    "jwt": ("令牌", "重定向"),
+    "buffer": ("缓冲区", "溢出", "栈控制"),
+    "format": ("格式化字符串",),
+    "heap": ("堆", "uaf", "tcache"),
+    "rop": ("rop", "ret2libc", "gadget", "shellcode", "libc"),
+    "binary": ("二进制", "可执行文件", "elf"),
+    "obfuscated": ("混淆", "加壳", "剥壳", "虚拟机", "字节码"),
+    "reverse": ("逆向", "反调试", "恢复协议", "理解可执行文件"),
+    "pyjails": ("沙箱",),
+    "qr": ("二维码",),
+    "unicode": ("unicode",),
+    "challenge": ("挑战", "压缩包", "远程", "服务", "nc"),
+    "vague": ("不知道类别", "还不知道", "弄清楚", "从哪里开始"),
+}
+
 
 def _parse_frontmatter(text: str) -> dict[str, str] | None:
     """解析 SKILL.md 文件使用的扁平 frontmatter 风格。"""
@@ -156,7 +175,8 @@ def _parse_frontmatter(text: str) -> dict[str, str] | None:
 
 def _tokenize(text: str) -> set[str]:
     """对文本进行分词并扩展常见的 CTF 同义词。"""
-    raw_tokens = set(re.findall(r"[a-z0-9_./+-]+", text.lower()))
+    lowered = text.lower()
+    raw_tokens = set(re.findall(r"[a-z0-9_./+-]+", lowered))
     base_tokens = {
         token
         for token in raw_tokens
@@ -167,6 +187,10 @@ def _tokenize(text: str) -> set[str]:
         if base_tokens & variants:
             expanded.add(canonical)
             expanded.update(variants)
+    for canonical, phrases in CHINESE_TOKEN_ALIASES.items():
+        if any(phrase in lowered for phrase in phrases):
+            expanded.add(canonical)
+            expanded.update(TOKEN_ALIASES.get(canonical, ()))
     return expanded
 
 

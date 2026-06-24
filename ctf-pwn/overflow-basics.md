@@ -189,11 +189,11 @@ modify_grade(0, str(WIN))  # Writes win addr as int to GOT entry
 
 ## Signed Integer Bypass (Negative Quantity)
 
-`scanf("%d")` 没做符号检查；负输入可绕过原本按无符号逻辑设计的比较。完整细节见 [advanced-exploits.md](advanced-exploits.md#signed-integer-bypass-negative-quantity)。
+`scanf("%d")` 没做符号检查；负输入可绕过原本按无符号逻辑设计的比较。完整细节见 [advanced-exploits.md](advanced-exploits.md#有符号整数绕过负数数量)。
 
 ## Canary-Aware Partial Overflow
 
-在不碰 canary 的前提下，溢出覆盖位于 buffer 与 canary 之间的 `valid` 标志。可用 `./` 作为无副作用路径填充以精准控长。完整利用链见 [advanced-exploits.md](advanced-exploits.md#canary-aware-partial-overflow)。
+在不碰 canary 的前提下，溢出覆盖位于 buffer 与 canary 之间的 `valid` 标志。可用 `./` 作为无副作用路径填充以精准控长。完整利用链见 [advanced-exploits.md](advanced-exploits.md#canary-感知的部分溢出)。
 
 ## OOB Read via Stride/Rate Leak (DiceCTF 2026)
 

@@ -10,36 +10,36 @@ from pathlib import Path
 # --- 模式定义 ---
 
 CRITICAL_PATTERNS = [
-    (r"rm\s+-rf\s+/", "破坏性命令：rm -rf /"),
-    (r"curl\s+[^\|]*\|\s*(ba)?sh", "管道执行shell：curl | sh"),
-    (r"wget\s+[^\|]*\|\s*(ba)?sh", "管道执行shell：wget | sh"),
-    (r"mkfs\.\w+\s+/dev/", "破坏性命令：对设备执行mkfs"),
-    (r"dd\s+.*of=/dev/(sd|hd|vd|nvme)", "破坏性命令：dd写入磁盘设备"),
-    (r":\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;\s*:", "Fork炸弹"),
+    (r"rm\s+-rf\s+/", "Destructive command: rm -rf /"),
+    (r"curl\s+[^\|]*\|\s*(ba)?sh", "Pipe to shell: curl | sh"),
+    (r"wget\s+[^\|]*\|\s*(ba)?sh", "Pipe to shell: wget | sh"),
+    (r"mkfs\.\w+\s+/dev/", "Destructive command: mkfs on device"),
+    (r"dd\s+.*of=/dev/(sd|hd|vd|nvme)", "Destructive command: dd to disk device"),
+    (r":\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;\s*:", "Fork bomb"),
 ]
 
 SECRET_PATTERNS = [
-    (r"\b(AKIA[0-9A-Z]{16})\b", "硬编码的AWS访问密钥"),
-    (r"-----BEGIN (RSA |EC |DSA )?PRIVATE KEY-----", "嵌入的私钥"),
-    (r"\b(ghp_[A-Za-z0-9_]{36,})\b", "硬编码的GitHub个人访问令牌"),
-    (r"\b(sk-[A-Za-z0-9]{20,})\b", "硬编码的API密钥（sk-...）"),
+    (r"\b(AKIA[0-9A-Z]{16})\b", "Hardcoded AWS access key"),
+    (r"-----BEGIN (RSA |EC |DSA )?PRIVATE KEY-----", "Embedded private key"),
+    (r"\b(ghp_[A-Za-z0-9_]{36,})\b", "Hardcoded GitHub personal access token"),
+    (r"\b(sk-[A-Za-z0-9]{20,})\b", "Hardcoded API key (sk-...)"),
 ]
 
 HIGH_PATTERNS = [
-    (r'(?<![\w.])eval\s*\(\s*["\']', "直接使用字符串字面量的eval()"),
-    (r'(?<![\w.])exec\s*\(\s*["\']', "直接使用字符串字面量的exec()"),
-    (r'os\.system\s*\(\s*f["\']', "os.system()使用f-string（存在注入风险）"),
+    (r'(?<![\w.])eval\s*\(\s*["\']', "Direct eval() of string literal"),
+    (r'(?<![\w.])exec\s*\(\s*["\']', "Direct exec() of string literal"),
+    (r'os\.system\s*\(\s*f["\']', "os.system() with f-string (injection risk)"),
     (
         r"<script[^>]*>.*document\.(cookie|location)",
-        "XSS载荷访问敏感DOM",
+        "XSS payload accessing sensitive DOM",
     ),
-    (r"chmod\s+[47]77\s+/", "系统路径上的全局可写权限"),
-    (r"--no-check-certificate", "禁用SSL验证"),
-    (r"verify\s*=\s*False", "Python中禁用SSL验证"),
+    (r"chmod\s+[47]77\s+/", "World-writable permissions on system path"),
+    (r"--no-check-certificate", "SSL verification disabled"),
+    (r"verify\s*=\s*False", "SSL verification disabled in Python"),
 ]
 
 INFO_PATTERNS = [
-    (r"\b(TODO|FIXME|HACK)\s*:", "发现代码注释"),
+    (r"\b(TODO|FIXME|HACK)\s*:", "Code annotation found"),
 ]
 
 PLACEHOLDER_HOST_MARKERS = (
@@ -77,10 +77,10 @@ CODE_COMMENT_PREFIXES = ("#", "//", "--", ";")
 
 
 FRONTMATTER_CHECKS = {
-    "license": "frontmatter中缺少license字段",
-    "allowed-tools": "frontmatter中缺少allowed-tools字段",
-    "name": "frontmatter中缺少name字段",
-    "description": "frontmatter中缺少description字段",
+    "license": "Missing license field in frontmatter",
+    "allowed-tools": "Missing allowed-tools field in frontmatter",
+    "name": "Missing name field in frontmatter",
+    "description": "Missing description field in frontmatter",
 }
 
 THIRD_PERSON_STARTERS = (
@@ -104,6 +104,29 @@ THIRD_PERSON_STARTERS = (
     "orchestrates",
     "delegates",
     "implements",
+)
+
+CHINESE_THIRD_PERSON_STARTERS = (
+    "提供",
+    "生成",
+    "解决",
+    "分析",
+    "提取",
+    "扫描",
+    "检测",
+    "识别",
+    "构建",
+    "创建",
+    "解析",
+    "运行",
+    "执行",
+    "处理",
+    "转换",
+    "验证",
+    "检查",
+    "编排",
+    "委派",
+    "实现",
 )
 
 
@@ -372,7 +395,10 @@ def scan_skill(skill_dir: Path) -> dict:
             if "description" in fm:
                 desc = fm["description"].strip('"').strip("'").strip()
                 first_word = desc.split()[0].lower() if desc else ""
-                if first_word and not first_word.endswith("s"):
+                chinese_third_person = any(
+                    desc.startswith(starter) for starter in CHINESE_THIRD_PERSON_STARTERS
+                )
+                if first_word and not first_word.endswith("s") and not chinese_third_person:
                     findings.append(
                         {
                             "severity": "INFO",
