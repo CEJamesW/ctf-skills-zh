@@ -228,6 +228,7 @@ def render_markdown_page(
             crumb_html += '<span class="crumb-sep">›</span>'
 
     title = html.escape(md_path.stem)
+    source_path = md_path.relative_to(REPO_ROOT).as_posix()
     page = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -242,7 +243,9 @@ def render_markdown_page(
     <article>{body_html}</article>
     <footer>
       <a href="{_get_repo_url()}">GitHub 仓库</a> &middot;
-      <a href="{_get_repo_url()}/blob/main/{md_path.relative_to(REPO_ROOT).as_posix()}">查看源 Markdown</a>
+      <a href="{_get_repo_url()}/blob/main/{source_path}">
+        查看源 Markdown
+      </a>
       &middot; MIT 许可证
     </footer>
   </div>

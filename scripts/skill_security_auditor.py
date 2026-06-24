@@ -68,11 +68,15 @@ CTF_EXEC_ALLOWLIST = re.compile(
     r"""exec\s*\(\s*['"](?:id|ls|cat |whoami|uname|pwd|echo )"""
 )
 
-# /tmp/目录默认全局可写 — chmod 777 /tmp/* 是内核利用（modprobe_path, core_pattern）中的标准操作，不构成系统风险
+# /tmp/ 目录默认全局可写；chmod 777 /tmp/* 是内核利用
+# （modprobe_path, core_pattern）中的标准操作，不构成系统风险。
 CTF_CHMOD_ALLOWLIST = re.compile(r"chmod\s+[47]77\s+/tmp/")
 
-# 各编程语言中使用的注释前缀。代码块内以这些前缀开头的行是文档注释，不是可执行代码 — HIGH级别模式不应触发，但CRITICAL和SECRET模式仍然适用。
-# 涵盖Python/Ruby/Bash/Perl (#)，JS/TS/Java/C/Go/Rust/PHP (//)，SQL/Lua/Haskell (--)，以及ASM (;)
+# 各编程语言中使用的注释前缀。代码块内以这些前缀开头的行
+# 是文档注释，不是可执行代码；HIGH 级别模式不应触发，但
+# CRITICAL 和 SECRET 模式仍然适用。
+# 涵盖 Python/Ruby/Bash/Perl (#)，JS/TS/Java/C/Go/Rust/PHP (//)，
+# SQL/Lua/Haskell (--)，以及 ASM (;)
 CODE_COMMENT_PREFIXES = ("#", "//", "--", ";")
 
 
@@ -386,7 +390,8 @@ def scan_skill(skill_dir: Path) -> dict:
                             "line": 0,
                             "rule": "name_mismatch",
                             "message": (
-                                f'Frontmatter 中的 name "{actual_name}" 与目录名 "{expected_name}" 不匹配'
+                                f'Frontmatter 中的 name "{actual_name}" '
+                                f'与目录名 "{expected_name}" 不匹配'
                             ),
                         }
                     )
@@ -396,9 +401,13 @@ def scan_skill(skill_dir: Path) -> dict:
                 desc = fm["description"].strip('"').strip("'").strip()
                 first_word = desc.split()[0].lower() if desc else ""
                 chinese_third_person = any(
-                    desc.startswith(starter) for starter in CHINESE_THIRD_PERSON_STARTERS
+                    desc.startswith(starter)
+                    for starter in CHINESE_THIRD_PERSON_STARTERS
                 )
-                if first_word and not first_word.endswith("s") and not chinese_third_person:
+                description_is_third_person = (
+                    first_word.endswith("s") or chinese_third_person
+                )
+                if first_word and not description_is_third_person:
                     findings.append(
                         {
                             "severity": "INFO",
